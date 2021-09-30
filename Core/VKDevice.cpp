@@ -1,4 +1,5 @@
 #include "VKDevice.h"
+#include "Exception.hpp"
 
 VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 				   const std::unordered_map<const char *, bool> &requested_extensions, VkQueueFlags requiredQueues) {
@@ -21,8 +22,7 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 				if (device->isExtensionSupported(n.first))
 					deviceExtensions.push_back(n.first);
 				else
-					throw std::runtime_error(
-						fmt::format("{} does not support: {}\n", device->getDeviceName(), n.first));
+					throw cxxexcept::RuntimeException("{} does not support: {}\n", device->getDeviceName(), n.first);
 			}
 		}
 	}
@@ -59,14 +59,14 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreations(nrQueues);
 	std::vector<float> queuePriorities(1.0f, nrQueues);
-	//if ((requiredQueues & VK_QUEUE_COMPUTE_BIT) && computeQueueNodeIndex != UINT32_MAX) {
-		VkDeviceQueueCreateInfo &queueCreateInfo = queueCreations[0];
-		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfo.pNext = nullptr;
-		queueCreateInfo.flags = 0;
-		queueCreateInfo.queueFamilyIndex = this->graphics_queue_node_index;
-		queueCreateInfo.queueCount = nrQueues;
-		queueCreateInfo.pQueuePriorities = queuePriorities.data();
+	// if ((requiredQueues & VK_QUEUE_COMPUTE_BIT) && computeQueueNodeIndex != UINT32_MAX) {
+	VkDeviceQueueCreateInfo &queueCreateInfo = queueCreations[0];
+	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueCreateInfo.pNext = nullptr;
+	queueCreateInfo.flags = 0;
+	queueCreateInfo.queueFamilyIndex = this->graphics_queue_node_index;
+	queueCreateInfo.queueCount = nrQueues;
+	queueCreateInfo.pQueuePriorities = queuePriorities.data();
 	//}
 	// std::vector<VkDeviceQueueCreateInfo> queueInfos(1);
 

@@ -1,7 +1,6 @@
 #ifndef _VKSAMPLES_VK_UTILS_H_
 #define _VKSAMPLES_VK_UTILS_H_ 1
-#include <fmt/format.h>
-#include <stdexcept>
+#include "Exception.hpp"
 #include <vulkan/vulkan.h>
 
 /**
@@ -51,7 +50,7 @@ static const char *getVKResultSymbol(int symbol) {
 	do {                                                                                                               \
 		VkResult _err = x;                                                                                             \
 		if (_err != VK_SUCCESS) {                                                                                      \
-			throw std::runtime_error(fmt::format("{} {} {} - {}", __FILE__, __LINE__, _err, getVKResultSymbol(_err))); \
+			throw cxxexcept::RuntimeException("{} {} {} - {}", __FILE__, __LINE__, _err, getVKResultSymbol(_err));     \
 		}                                                                                                              \
 	} while (0)
 

@@ -41,7 +41,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 				usedInstanceExtensionNames.push_back(n.first);
 				this->useValidationLayers = true;
 			} else
-				throw std::runtime_error(fmt::format("Vulkan Instance does not supported: {}\n", n.first));
+				throw cxxexcept::RuntimeException("Vulkan Instance does not supported: {}\n", n.first);
 		}
 	}
 
