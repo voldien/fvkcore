@@ -12,11 +12,13 @@
 #define ArraySize(a) (sizeof(a) / sizeof(*a))
 
 /**
+ * @brief Helper functions.
+ * Set of functions for common
+ * vulkan related.
  *
  */
 class VKHelper {
   public:
-	/*  Helper functions.   */
 
 	/**
 	 * @brief

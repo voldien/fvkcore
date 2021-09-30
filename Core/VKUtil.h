@@ -4,6 +4,12 @@
 #include <stdexcept>
 #include <vulkan/vulkan.h>
 
+/**
+ * @brief
+ *
+ * @param symbol
+ * @return const char*
+ */
 static const char *getVKResultSymbol(int symbol) {
 	switch (symbol) {
 	case VK_SUCCESS:

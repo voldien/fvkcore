@@ -1,3 +1,6 @@
 [submodule "extern/Vulkan-Headers"]
 	path = extern/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "extern/execptcxx"]
+	path = extern/execptcxx
+	url = https://github.com/voldien/execptcxx.git
