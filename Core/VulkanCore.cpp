@@ -1,8 +1,6 @@
 #include "VulkanCore.h"
 #include "VKHelper.h"
 #include "VkPhysicalDevice.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_vulkan.h>
 #include <cassert>
 #include <csignal>
 #include <cstdio>
@@ -27,10 +25,6 @@ static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugRep
 
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_extensions,
 							const std::unordered_map<const char *, bool> &requested_layers) {
-	/*  Initialize video support.   */
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
-		throw std::runtime_error(fmt::format("Failed init SDL video: {}", SDL_GetError()));
-	}
 
 	std::vector<const char *> usedInstanceExtensionNames = {
 		/*	*/
@@ -78,22 +72,6 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 		for (uint32_t i = 0; i < instanceLayers.size(); i++) {
 		}
 	}
-
-	/*  TODO add support for loading requried extensions.   */
-	// TODO improve later.
-	/*  Create Vulkan window.   */
-	SDL_Window *tmpWindow = SDL_CreateWindow("", 0, 0, 1, 1, SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN);
-	if (tmpWindow == NULL)
-		throw std::runtime_error(fmt::format("Failed to create Tmp Vulkan window - {}", SDL_GetError()));
-	/*	*/
-	unsigned int count;
-	if (!SDL_Vulkan_GetInstanceExtensions(tmpWindow, &count, nullptr))
-		throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions");
-	unsigned int additional_extension_count = (unsigned int)usedInstanceExtensionNames.size();
-	usedInstanceExtensionNames.resize((size_t)(additional_extension_count + count));
-	if (!SDL_Vulkan_GetInstanceExtensions(tmpWindow, &count, &usedInstanceExtensionNames[additional_extension_count]))
-		throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions");
-	SDL_DestroyWindow(tmpWindow);
 
 	/*  Get Latest Vulkan version. */
 	uint32_t version;
