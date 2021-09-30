@@ -9,7 +9,6 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#define ArraySize(a) (sizeof(a) / sizeof(*a))
 
 /**
  * @brief Helper functions.
@@ -537,6 +536,10 @@ class VKHelper {
 
 		/*	*/
 		vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+	}
+
+	static VkSurfaceKHR createSurface(VkInstance instance){
+		
 	}
 };
 
