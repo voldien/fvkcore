@@ -26,7 +26,8 @@ class VulkanCore {
 	template <typename T>
 	VulkanCore(const std::vector<std::string> &requested_extensions, const std::vector<std::string> &requested_layers,
 			   const std::string &Name, uint32_t version, const std::string &engine, unsigned int engineVersion,
-			   uint32_t vulkanVersion, VkStructureType type, T &creationNext) noexcept {}
+			   uint32_t vulkanVersion, VkStructureType type, T &creationNext) noexcept
+		: VulkanCore() {}
 	VulkanCore(const VulkanCore &other) = delete;
 	VulkanCore(VulkanCore &&other) = delete;
 	virtual ~VulkanCore();
