@@ -44,31 +44,26 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	};
 	std::vector<const char *> useValidationLayers;
 
-	if (this->useValidationLayers) {
-		/*  Check if exists.    */
-		for (uint32_t i = 0; i < instanceLayers.size(); i++) {
-		}
-	}
+	/*  Check if exists.    */
 
+	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_extensions.size());
 	for (const std::pair<const char *, bool> &n : requested_extensions) {
-		// TODO add logic to determine if supported.
 		if (n.second) {
 			if (isInstanceExtensionSupported(n.first)) {
 				usedInstanceExtensionNames.push_back(n.first);
-				this->useValidationLayers = true;
 			} else
-				throw cxxexcept::RuntimeException("Vulkan Instance does not supported: {}\n", n.first);
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}\n", n.first);
 		}
 	}
 
 	/*	*/
-
 	useValidationLayers.reserve(useValidationLayers.size() + requested_layers.size());
 	for (const std::pair<const char *, bool> &n : requested_layers) {
-		// TODO add logic to determine if supported.
 		if (n.second) {
-			useValidationLayers.push_back(n.first);
-			this->useValidationLayers = true;
+			if (isInstanceLayerSupported(n.first)) {
+				useValidationLayers.push_back(n.first);
+			} else
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}\n", n.first);
 		}
 	}
 

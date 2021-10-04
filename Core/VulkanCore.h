@@ -130,7 +130,6 @@ class VulkanCore {
 
 	int nrGroupDevices;
 
-	bool useValidationLayers;
 	bool enableDebugTracer;
 
 	uint32_t queue_count;
