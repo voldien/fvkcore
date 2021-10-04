@@ -1,5 +1,5 @@
-#ifndef _COMMON_VULKAN_SAMPLES_CORE_H_
-#define _COMMON_VULKAN_SAMPLES_CORE_H_ 1
+#ifndef _FRAG_CORE_VULKAN_CORE_H_
+#define _FRAG_CORE_VULKAN_CORE_H_ 1
 #include "VKUtil.h"
 #include <algorithm>
 #include <cstring>
@@ -15,54 +15,40 @@ class PhysicalDevice;
  *
  */
 class VulkanCore {
-	friend class VKWindow;
+  protected:
+	VulkanCore();
 
   public:
-	// TODO remove argc and argv
-	VulkanCore(const std::unordered_map<const char *, bool> &requested_extensions = {},
-			   const std::unordered_map<const char *, bool> &requested_layers = {
-				   {"VK_LAYER_KHRONOS_validation", true}});
+	VulkanCore(const std::unordered_map<const char *, bool> &requested_extensions,
+			   const std::unordered_map<const char *, bool> &requested_layers = {{"VK_LAYER_KHRONOS_validation", true}},
+			   void *pNext = nullptr);
+
+	template <typename T>
+	VulkanCore(const std::vector<std::string> &requested_extensions, const std::vector<std::string> &requested_layers,
+			   const std::string &Name, uint32_t version, const std::string &engine, unsigned int engineVersion,
+			   uint32_t vulkanVersion, VkStructureType type, T &creationNext) noexcept {}
 	VulkanCore(const VulkanCore &other) = delete;
 	VulkanCore(VulkanCore &&other) = delete;
-	~VulkanCore(void);
+	virtual ~VulkanCore();
 
 	VulkanCore &operator=(const VulkanCore &) = delete;
 	VulkanCore &operator=(VulkanCore &&) = delete;
 
 	virtual void Initialize(const std::unordered_map<const char *, bool> &requested_extensions,
-							const std::unordered_map<const char *, bool> &requested_layers);
+							const std::unordered_map<const char *, bool> &requested_layers, void *pNext = nullptr);
 
-	const std::vector<VkExtensionProperties> &getInstanceExtensions(void) const noexcept {
+	const std::vector<VkExtensionProperties> &getInstanceExtensions() const noexcept {
 		return this->instanceExtensions;
 	}
-	const std::vector<VkLayerProperties> &getInstanceLayers(void) const noexcept { return this->instanceLayers; }
 
-	/**
-	 * @brief
-	 *
-	 * @param extension
-	 * @return true
-	 * @return false
-	 */
+	const std::vector<VkLayerProperties> &getInstanceLayers() const noexcept { return this->instanceLayers; }
+
 	bool isInstanceExtensionSupported(const std::string &extension) const {
-		return std::find_if(getInstanceExtensions().begin(), getInstanceExtensions().end(),
-							[extension](const VkExtensionProperties &device_extension) {
-								return std::strcmp(device_extension.extensionName, extension.c_str()) == 0;
-							}) != getInstanceExtensions().cend();
+		return isInstanceExtensionSupported(this->getInstanceExtensions(), extension);
 	}
 
-	/**
-	 * @brief
-	 *
-	 * @param extension
-	 * @return true
-	 * @return false
-	 */
-	bool isInstanceLayerSupported(const std::string &extension) const {
-		return std::find_if(getInstanceLayers().begin(), getInstanceLayers().end(),
-							[extension](const VkLayerProperties &device_layers) {
-								return std::strcmp(device_layers.layerName, extension.c_str()) == 0;
-							}) != getInstanceLayers().cend();
+	bool isInstanceLayerSupported(const std::string &layer) const {
+		return isInstanceLayerSupported(getInstanceLayers(), layer);
 	}
 
 	/**
@@ -70,23 +56,23 @@ class VulkanCore {
 	 *
 	 * @return const std::vector<VkPhysicalDevice>&
 	 */
-	const std::vector<VkPhysicalDevice> &getPhysicalDevices(void) const noexcept { return this->physicalDevices; }
+	const std::vector<VkPhysicalDevice> &getPhysicalDevices() const noexcept { return this->physicalDevices; }
 
-	uint32_t getNrPhysicalDevices(void) const noexcept { return getPhysicalDevices().size(); }
+	uint32_t getNrPhysicalDevices() const noexcept { return getPhysicalDevices().size(); }
 
 	/**
 	 * @brief Get the Handle object
 	 *
 	 * @return VkInstance
 	 */
-	virtual VkInstance getHandle(void) const noexcept { return this->inst; }
+	virtual VkInstance getHandle() const noexcept { return this->inst; }
 
 	/**
 	 * @brief Get the Device Group Properties object
 	 *
 	 * @return std::vector<VkPhysicalDeviceGroupProperties>
 	 */
-	std::vector<VkPhysicalDeviceGroupProperties> getDeviceGroupProperties(void) const {
+	std::vector<VkPhysicalDeviceGroupProperties> getDeviceGroupProperties() const {
 
 		uint32_t nrGroups;
 		VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->getHandle(), &nrGroups, nullptr));
@@ -101,7 +87,7 @@ class VulkanCore {
 	 *
 	 * @return std::vector<PhysicalDevice *>
 	 */
-	std::vector<std::shared_ptr<PhysicalDevice>> createPhysicalDevices(void) const;
+	std::vector<std::shared_ptr<PhysicalDevice>> createPhysicalDevices() const;
 
 	/**
 	 * @brief Create a Physical Device object
@@ -110,6 +96,29 @@ class VulkanCore {
 	 * @return PhysicalDevice*
 	 */
 	std::shared_ptr<PhysicalDevice> createPhysicalDevice(unsigned int index) const;
+
+  public:
+	static bool isInstanceExtensionSupported(const std::vector<VkExtensionProperties> &extensions,
+											 const std::string &extension) {
+		return std::find_if(extensions.begin(), extensions.end(),
+							[extension](const VkExtensionProperties &device_extension) {
+								return std::strcmp(device_extension.extensionName, extension.c_str()) == 0;
+							}) != extensions.cend();
+	}
+	static bool isInstanceLayerSupported(const std::vector<VkLayerProperties> &layers, const std::string &layer) {
+		return std::find_if(layers.begin(), layers.end(), [layer](const VkLayerProperties &device_layers) {
+				   return std::strcmp(device_layers.layerName, layer.c_str()) == 0;
+			   }) != layers.cend();
+	}
+
+	static std::vector<VkExtensionProperties> getSupportedExtensions();
+	static std::vector<VkLayerProperties> getSupportedLayers();
+
+	static uint32_t getVersion() {
+		uint32_t version;
+		VKS_VALIDATE(vkEnumerateInstanceVersion(&version));
+		return version;
+	}
 
   protected:
 	/*	*/

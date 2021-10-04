@@ -15,36 +15,36 @@ class PhysicalDevice {
 	PhysicalDevice(const PhysicalDevice &) = delete;
 	PhysicalDevice(PhysicalDevice &&) = delete;
 
-	const VkPhysicalDeviceFeatures &getFeatures(void) const noexcept { return features; }
+	const VkPhysicalDeviceFeatures &getFeatures() const noexcept { return features; }
 
-	VkPhysicalDeviceProperties getProperties(void) noexcept { return properties; }
-	const VkPhysicalDeviceProperties &getProperties(void) const noexcept { return properties; }
+	VkPhysicalDeviceProperties getProperties() noexcept { return properties; }
+	const VkPhysicalDeviceProperties &getProperties() const noexcept { return properties; }
 
-	VkPhysicalDeviceMemoryProperties getMemoryProperties(void) noexcept { return memProperties; }
-	const VkPhysicalDeviceMemoryProperties &getMemoryProperties(void) const noexcept { return memProperties; }
+	VkPhysicalDeviceMemoryProperties getMemoryProperties() noexcept { return memProperties; }
+	const VkPhysicalDeviceMemoryProperties &getMemoryProperties() const noexcept { return memProperties; }
 
-	const VkPhysicalDeviceLimits &getDeviceLimits(void) const noexcept { return this->properties.limits; }
+	const VkPhysicalDeviceLimits &getDeviceLimits() const noexcept { return this->properties.limits; }
 
-	inline const VkPhysicalDeviceDriverProperties getDeviceDriverProperties(void) {
+	inline const VkPhysicalDeviceDriverProperties getDeviceDriverProperties() {
 		VkPhysicalDeviceDriverProperties devceProp;
 		getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES, devceProp);
 		return devceProp;
 	}
 
-	inline const VkPhysicalDeviceSubgroupProperties getDeviceSubGroupProperties(void) {
+	inline const VkPhysicalDeviceSubgroupProperties getDeviceSubGroupProperties() {
 		VkPhysicalDeviceSubgroupProperties devceProp;
 		getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES, devceProp);
 		return devceProp;
 	}
 
-	unsigned int getNrQueueFamilyProperties(void) const noexcept { return this->queueFamilyProperties.size(); }
+	unsigned int getNrQueueFamilyProperties() const noexcept { return this->queueFamilyProperties.size(); }
 	/**
 	 * @brief Get the Queue Family Properties object
 	 * Get all the support family properties.
 	 *
 	 * @return const std::vector<VkQueueFamilyProperties>&
 	 */
-	const std::vector<VkQueueFamilyProperties> &getQueueFamilyProperties(void) const noexcept {
+	const std::vector<VkQueueFamilyProperties> &getQueueFamilyProperties() const noexcept {
 		return queueFamilyProperties;
 	}
 
@@ -105,25 +105,24 @@ class PhysicalDevice {
 	// 							const std::vector<VkFormat> &requestFormats, VkImageTiling tiling,
 	// 							VkFormatFeatureFlags features) {}
 
-	bool isLocalandStagning(void) const noexcept {
+	bool isLocalandStagning() const noexcept {
 		const VkPhysicalDeviceMemoryProperties &prop = getMemoryProperties();
 		for (unsigned int i = 0; i < prop.memoryHeapCount; i++) {
 			const VkMemoryType &memoryType = prop.memoryTypes[i];
-			if(memoryType.propertyFlags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT){
-
+			if (memoryType.propertyFlags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) {
 			}
 		}
 		return false;
 	}
 
-	VkPhysicalDevice getHandle(void) const noexcept { return this->mdevice; }
+	VkPhysicalDevice getHandle() const noexcept { return this->mdevice; }
 
 	/**
 	 * @brief Get the Extensions object
 	 *
 	 * @return const std::vector<VkExtensionProperties>&
 	 */
-	const std::vector<VkExtensionProperties> &getExtensions(void) const noexcept { return this->extensions; }
+	const std::vector<VkExtensionProperties> &getExtensions() const noexcept { return this->extensions; }
 
 	/**
 	 * @brief
@@ -172,7 +171,7 @@ class PhysicalDevice {
 		vkGetPhysicalDeviceProperties2(getHandle(), &properties);
 	}
 
-	const char *getDeviceName(void) const noexcept;
+	const char *getDeviceName() const noexcept;
 
   private:
 	VkPhysicalDevice mdevice;

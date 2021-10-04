@@ -9,7 +9,6 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-
 /**
  * @brief Helper functions.
  * Set of functions for common
@@ -18,7 +17,6 @@
  */
 class VKHelper {
   public:
-
 	/**
 	 * @brief
 	 *
@@ -137,7 +135,7 @@ class VKHelper {
 		throw std::runtime_error("failed to find supported format!");
 	}
 
-	static void getImageFormatProperties(void) {
+	static void getImageFormatProperties() {
 		// vkGetPhysicalDeviceImageFormatProperties()
 	}
 
@@ -322,7 +320,7 @@ class VKHelper {
 		return pipelineCache;
 	}
 
-	static VkPipeline createGraphicPipeline(void);
+	static VkPipeline createGraphicPipeline();
 
 	static VkPipeline createComputePipeline(VkDevice device, VkPipelineLayout layout,
 											const VkPipelineShaderStageCreateInfo &compShaderStageInfo,
@@ -538,9 +536,7 @@ class VKHelper {
 		vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 	}
 
-	static VkSurfaceKHR createSurface(VkInstance instance){
-		
-	}
+	static VkSurfaceKHR createSurface(VkInstance instance) {}
 };
 
 #endif

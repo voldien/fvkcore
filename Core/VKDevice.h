@@ -32,7 +32,7 @@ class VKDevice {
 			 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT);
 	VKDevice(const VKDevice &) = delete;
 	VKDevice(VKDevice &&) = delete;
-	~VKDevice(void);
+	~VKDevice();
 
 	/**
 	 * @brief
@@ -40,26 +40,24 @@ class VKDevice {
 	 * @return true
 	 * @return false
 	 */
-	bool isGroupDevice(void) const noexcept { return getPhysicalDevices().size() > 0; }
-	const std::vector<std::shared_ptr<PhysicalDevice>> &getPhysicalDevices(void) const noexcept {
-		return physicalDevices;
-	}
+	bool isGroupDevice() const noexcept { return getPhysicalDevices().size() > 0; }
+	const std::vector<std::shared_ptr<PhysicalDevice>> &getPhysicalDevices() const noexcept { return physicalDevices; }
 
-	unsigned int getNrPhysicalDevices(void) const noexcept { return this->physicalDevices.size(); }
+	unsigned int getNrPhysicalDevices() const noexcept { return this->physicalDevices.size(); }
 	const std::shared_ptr<PhysicalDevice> &getPhysicalDevice(unsigned int index) const {
 		return physicalDevices[index];
 	}
 
-	VkDevice getHandle(void) const noexcept { return this->logicalDevice; }
+	VkDevice getHandle() const noexcept { return this->logicalDevice; }
 
-	VkQueue getDefaultGraphicQueue(void) const noexcept { return this->graphicsQueue; }
-	VkQueue getDefaultPresent(void) const noexcept { return this->presentQueue; }
-	VkQueue getDefaultCompute(void) const noexcept { return this->computeQueue; }
-	VkQueue getDefaultTransfer(void) const noexcept { return this->transferQueue; }
+	VkQueue getDefaultGraphicQueue() const noexcept { return this->graphicsQueue; }
+	VkQueue getDefaultPresent() const noexcept { return this->presentQueue; }
+	VkQueue getDefaultCompute() const noexcept { return this->computeQueue; }
+	VkQueue getDefaultTransfer() const noexcept { return this->transferQueue; }
 
-	uint32_t getDefaultGraphicQueueIndex(void) const noexcept { return this->graphics_queue_node_index; }
-	uint32_t getDefaultComputeQueueIndex(void) const noexcept { return this->compute_queue_node_index; }
-	uint32_t getDefaultTransferQueueIndex(void) const noexcept { return this->transfer_queue_node_index; }
+	uint32_t getDefaultGraphicQueueIndex() const noexcept { return this->graphics_queue_node_index; }
+	uint32_t getDefaultComputeQueueIndex() const noexcept { return this->compute_queue_node_index; }
+	uint32_t getDefaultTransferQueueIndex() const noexcept { return this->transfer_queue_node_index; }
 
 	/**
 	 * @brief

@@ -123,7 +123,7 @@ VKDevice::VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 	VKDevice(physical, requested_extensions, requiredQueues);
 }
 
-VKDevice::~VKDevice(void) {
+VKDevice::~VKDevice() {
 	if (getHandle() != VK_NULL_HANDLE)
 		vkDestroyDevice(getHandle(), VK_NULL_HANDLE);
 }

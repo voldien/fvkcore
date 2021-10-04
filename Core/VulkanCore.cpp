@@ -12,8 +12,17 @@
 #include <getopt.h>
 #include <stdexcept>
 
+VulkanCore::VulkanCore() {
+	/*  Check for supported extensions.*/
+	this->instanceExtensions = getSupportedExtensions();
+
+	/*  Check for supported validation layers.  */
+	this->instanceLayers = getSupportedLayers();
+}
+
 VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_extensions,
-					   const std::unordered_map<const char *, bool> &requested_layers) {
+					   const std::unordered_map<const char *, bool> &requested_layers, void *pNext)
+	: VulkanCore() {
 	Initialize(requested_extensions, requested_layers);
 }
 
@@ -24,7 +33,7 @@ static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugRep
 }
 
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_extensions,
-							const std::unordered_map<const char *, bool> &requested_layers) {
+							const std::unordered_map<const char *, bool> &requested_layers, void *pNext) {
 
 	std::vector<const char *> usedInstanceExtensionNames = {
 		/*	*/
@@ -33,6 +42,13 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 		VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 		VK_KHR_DISPLAY_EXTENSION_NAME,
 	};
+	std::vector<const char *> useValidationLayers;
+
+	if (this->useValidationLayers) {
+		/*  Check if exists.    */
+		for (uint32_t i = 0; i < instanceLayers.size(); i++) {
+		}
+	}
 
 	for (const std::pair<const char *, bool> &n : requested_extensions) {
 		// TODO add logic to determine if supported.
@@ -46,30 +62,13 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	}
 
 	/*	*/
-	std::vector<const char *> validationLayers;
-	validationLayers.reserve(validationLayers.size() + requested_layers.size());
+
+	useValidationLayers.reserve(useValidationLayers.size() + requested_layers.size());
 	for (const std::pair<const char *, bool> &n : requested_layers) {
 		// TODO add logic to determine if supported.
 		if (n.second) {
-			validationLayers.push_back(n.first);
+			useValidationLayers.push_back(n.first);
 			this->useValidationLayers = true;
-		}
-	}
-
-	/*  Check for supported extensions.*/
-	uint32_t extensionCount = 0;
-	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, VK_NULL_HANDLE));
-	this->instanceExtensions.resize(extensionCount);
-	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, instanceExtensions.data()));
-
-	/*  Check for supported validation layers.  */
-	uint32_t layerCount;
-	VKS_VALIDATE(vkEnumerateInstanceLayerProperties(&layerCount, VK_NULL_HANDLE));
-	instanceLayers.resize(layerCount);
-	VKS_VALIDATE(vkEnumerateInstanceLayerProperties(&layerCount, instanceLayers.data()));
-	if (this->useValidationLayers) {
-		/*  Check if exists.    */
-		for (uint32_t i = 0; i < instanceLayers.size(); i++) {
 		}
 	}
 
@@ -87,39 +86,34 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	ai.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	ai.apiVersion = version;
 
-	VkDebugReportCallbackCreateInfoEXT callbackCreateInfoExt{};
-	callbackCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT; // sType
-	callbackCreateInfoExt.pNext = NULL;													   // pNext
-	callbackCreateInfoExt.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT |						   // flags
-								  VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	callbackCreateInfoExt.pfnCallback = &myDebugReportCallbackEXT; // myOutputDebugString, // pfnCallback
-	callbackCreateInfoExt.pUserData = VK_NULL_HANDLE;			   // pUserData
-	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoExt{};
-	debugUtilsMessengerCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	debugUtilsMessengerCreateInfoExt.pNext = &callbackCreateInfoExt;
-	VkValidationCheckEXT validationCheckExt[] = {VK_VALIDATION_CHECK_ALL_EXT};
-	VkValidationFlagsEXT validationFlagsExt{};
-	validationFlagsExt.sType = VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT;
-	validationFlagsExt.pNext = VK_NULL_HANDLE; //&debugUtilsMessengerCreateInfoExt,
-	validationFlagsExt.disabledValidationCheckCount = 1;
-	validationFlagsExt.pDisabledValidationChecks = validationCheckExt;
+	// VkDebugReportCallbackCreateInfoEXT callbackCreateInfoExt{};
+	// callbackCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT; // sType
+	// callbackCreateInfoExt.pNext = NULL;													   // pNext
+	// callbackCreateInfoExt.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT |						   // flags
+	// 							  VK_DEBUG_REPORT_WARNING_BIT_EXT;
+	// callbackCreateInfoExt.pfnCallback = &myDebugReportCallbackEXT; // myOutputDebugString, // pfnCallback
+	// callbackCreateInfoExt.pUserData = VK_NULL_HANDLE;			   // pUserData
+	// VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoExt{};
+	// debugUtilsMessengerCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	// debugUtilsMessengerCreateInfoExt.pNext = &callbackCreateInfoExt;
+	// VkValidationCheckEXT validationCheckExt[] = {VK_VALIDATION_CHECK_ALL_EXT};
+	// VkValidationFlagsEXT validationFlagsExt{};
+
+	// validationFlagsExt.sType = VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT;
+	// validationFlagsExt.pNext = pNext; //&debugUtilsMessengerCreateInfoExt,
+	// validationFlagsExt.disabledValidationCheckCount = 1;
+	// validationFlagsExt.pDisabledValidationChecks = validationCheckExt;
 
 	/*	Prepare the instance object. */
 	VkInstanceCreateInfo ici = {};
 	ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	if (this->useValidationLayers)
-		ici.pNext = &callbackCreateInfoExt;
-	else
-		ici.pNext = NULL;
+	ici.pNext = pNext;
 	ici.flags = 0;
 	ici.pApplicationInfo = &ai;
-	if (this->useValidationLayers) {
-		ici.enabledLayerCount = validationLayers.size();
-		ici.ppEnabledLayerNames = validationLayers.data();
-	} else {
-		ici.enabledLayerCount = 0;
-		ici.ppEnabledLayerNames = VK_NULL_HANDLE;
-	}
+	/*	*/
+	ici.enabledLayerCount = useValidationLayers.size();
+	ici.ppEnabledLayerNames = useValidationLayers.data();
+	/*	*/
 	ici.enabledExtensionCount = usedInstanceExtensionNames.size();
 	ici.ppEnabledExtensionNames = usedInstanceExtensionNames.data();
 
@@ -138,15 +132,12 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	uint32_t nrPhysicalDeviceGroupCount;
 	VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->inst, &nrPhysicalDeviceGroupCount, VK_NULL_HANDLE));
 
+	/*	TODO only if extension being requested.	*/
 	std::vector<VkPhysicalDeviceGroupProperties> phyiscalGroupDevices(nrPhysicalDeviceGroupCount);
 	VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->inst, &nrPhysicalDeviceGroupCount, phyiscalGroupDevices.data()));
-
-	/*  TODO add selection function. */
-	std::vector<VkPhysicalDevice> selectedDevices;
-	VKHelper::selectDefaultDevices(physicalDevices, selectedDevices);
 }
 
-std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices(void) const {
+std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices() const {
 	std::vector<std::shared_ptr<PhysicalDevice>> _physicalDevices(getPhysicalDevices().size());
 	for (uint32_t i = 0; i < getPhysicalDevices().size(); i++) {
 		_physicalDevices[i] = std::move(createPhysicalDevice(i));
@@ -158,7 +149,27 @@ std::shared_ptr<PhysicalDevice> VulkanCore::createPhysicalDevice(unsigned int in
 	return std::make_shared<PhysicalDevice>(getHandle(), getPhysicalDevices()[index]);
 }
 
-VulkanCore::~VulkanCore(void) {
+VulkanCore::~VulkanCore() {
 	if (inst)
 		vkDestroyInstance(inst, nullptr);
+}
+
+std::vector<VkExtensionProperties> VulkanCore::getSupportedExtensions() {
+
+	std::vector<VkExtensionProperties> instanceExtensions;
+
+	uint32_t extensionCount = 0;
+	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, VK_NULL_HANDLE));
+	instanceExtensions.resize(extensionCount);
+	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, instanceExtensions.data()));
+	return instanceExtensions;
+}
+std::vector<VkLayerProperties> VulkanCore::getSupportedLayers() {
+	std::vector<VkLayerProperties> instanceLayers;
+	uint32_t layerCount = 0;
+	VKS_VALIDATE(vkEnumerateInstanceLayerProperties(&layerCount, VK_NULL_HANDLE));
+	instanceLayers.resize(layerCount);
+	VKS_VALIDATE(vkEnumerateInstanceLayerProperties(&layerCount, instanceLayers.data()));
+
+	return instanceLayers;
 }
