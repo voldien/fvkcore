@@ -20,10 +20,10 @@ VulkanCore::VulkanCore() {
 	this->instanceLayers = getSupportedLayers();
 }
 
-VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_extensions,
-					   const std::unordered_map<const char *, bool> &requested_layers, void *pNext)
+VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_instance_extensions,
+					   const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext)
 	: VulkanCore() {
-	Initialize(requested_extensions, requested_layers);
+	Initialize(requested_instance_extensions, requested_instance_layers);
 }
 
 static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
@@ -32,8 +32,8 @@ static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugRep
 	return VK_TRUE;
 }
 
-void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_extensions,
-							const std::unordered_map<const char *, bool> &requested_layers, void *pNext) {
+void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
+							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
 
 	std::vector<const char *> usedInstanceExtensionNames = {
 		/*	*/
@@ -46,8 +46,8 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 
 	/*  Check if exists.    */
 
-	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_extensions.size());
-	for (const std::pair<const char *, bool> &n : requested_extensions) {
+	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_instance_extensions.size());
+	for (const std::pair<const char *, bool> &n : requested_instance_extensions) {
 		if (n.second) {
 			if (isInstanceExtensionSupported(n.first)) {
 				usedInstanceExtensionNames.push_back(n.first);
@@ -57,8 +57,8 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	}
 
 	/*	*/
-	useValidationLayers.reserve(useValidationLayers.size() + requested_layers.size());
-	for (const std::pair<const char *, bool> &n : requested_layers) {
+	useValidationLayers.reserve(useValidationLayers.size() + requested_instance_layers.size());
+	for (const std::pair<const char *, bool> &n : requested_instance_layers) {
 		if (n.second) {
 			if (isInstanceLayerSupported(n.first)) {
 				useValidationLayers.push_back(n.first);
