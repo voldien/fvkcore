@@ -35,6 +35,7 @@ static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugRep
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_extensions,
 							const std::unordered_map<const char *, bool> &requested_layers, void *pNext) {
 
+	// TODO to be removed, to allow the user to specific explicity.
 	std::vector<const char *> usedInstanceExtensionNames = {
 		/*	*/
 		//		VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
@@ -44,8 +45,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	};
 	std::vector<const char *> useValidationLayers;
 
-	/*  Check if exists.    */
-
+	/*  Check if requesed instance extension is supported.    */
 	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_extensions.size());
 	for (const std::pair<const char *, bool> &n : requested_extensions) {
 		if (n.second) {
@@ -56,7 +56,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 		}
 	}
 
-	/*	*/
+	/*  Check if requesed instance layer is supported.    */
 	useValidationLayers.reserve(useValidationLayers.size() + requested_layers.size());
 	for (const std::pair<const char *, bool> &n : requested_layers) {
 		if (n.second) {
