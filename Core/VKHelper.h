@@ -82,7 +82,7 @@ class VKHelper {
 			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		} else {
-			// throw std::invalid_argument("unsupported layout transition!");
+			// throw cxxexcept::InvalidArgumentException("unsupported layout transition!");
 		}
 
 		vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
@@ -112,7 +112,7 @@ class VKHelper {
 		if (typeIndex)
 			allocInfo.memoryTypeIndex = typeIndex.value();
 		else
-			throw std::runtime_error("");
+			throw cxxexcept::RuntimeException("");
 
 		/**/
 		VKS_VALIDATE(vkAllocateMemory(device, &allocInfo, pAllocator, &deviceMemory));
@@ -132,7 +132,7 @@ class VKHelper {
 			}
 		}
 
-		throw std::runtime_error("failed to find supported format!");
+		throw cxxexcept::RuntimeException("failed to find supported format!");
 	}
 
 	static void getImageFormatProperties() {

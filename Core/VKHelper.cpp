@@ -45,7 +45,7 @@ void VKHelper::createBuffer(VkDevice device, VkDeviceSize size, const VkPhysical
 	if (typeIndex)
 		allocInfo.memoryTypeIndex = typeIndex.value();
 	else
-		throw std::runtime_error("Could not find valid memory index");
+		throw cxxexcept::RuntimeException("Could not find valid memory index");
 
 	/**/
 	VKS_VALIDATE(vkAllocateMemory(device, &allocInfo, NULL, &bufferMemory));
