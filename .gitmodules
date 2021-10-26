@@ -3,4 +3,4 @@
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
 [submodule "extern/execptcxx"]
 	path = extern/execptcxx
-	url = https://github.com/voldien/execptcxx.git
+	url = https://github.com/voldien/exceptcxx.git
