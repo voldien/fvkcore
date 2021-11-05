@@ -24,7 +24,7 @@ FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h )
 
 ADD_LIBRARY(vkcommon-core ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept  Vulkan-Headers PRIVATE ${Vulkan_LIBRARIES} )
+TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
 
 TARGET_COMPILE_FEATURES(vkcommon-core PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
