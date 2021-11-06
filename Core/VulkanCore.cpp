@@ -45,14 +45,13 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	std::vector<const char *> useValidationLayers;
 
 	/*  Check if exists.    */
-
 	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_instance_extensions.size());
 	for (const std::pair<const char *, bool> &n : requested_instance_extensions) {
 		if (n.second) {
 			if (isInstanceExtensionSupported(n.first)) {
 				usedInstanceExtensionNames.push_back(n.first);
 			} else
-				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}\n", n.first);
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}", n.first);
 		}
 	}
 
@@ -63,7 +62,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 			if (isInstanceLayerSupported(n.first)) {
 				useValidationLayers.push_back(n.first);
 			} else
-				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}\n", n.first);
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}", n.first);
 		}
 	}
 
