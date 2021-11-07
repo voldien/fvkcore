@@ -203,6 +203,7 @@ void VKHelper::selectDefaultDevices(std::vector<VkPhysicalDevice> &devices,
 			/*	TODO determine if it can draw and display.	*/
 			// preliminaryDevices.push_back(device);
 		} else {
+			/*	*/
 		}
 	}
 

@@ -87,8 +87,10 @@ class PhysicalDevice {
 			return true;
 		else if (result == VK_ERROR_FORMAT_NOT_SUPPORTED)
 			return false;
-		else
+		else {
 			VKS_VALIDATE(result);
+			return false;
+		}
 	}
 
 	void getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept {
