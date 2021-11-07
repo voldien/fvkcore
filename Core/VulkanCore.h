@@ -30,6 +30,7 @@ class VulkanCore {
 			   const std::string &engine, unsigned int engineVersion, uint32_t vulkanVersion, VkStructureType type,
 			   T &creationNext) noexcept
 		: VulkanCore() {}
+	VulkanCore(VkInstance instance);
 	VulkanCore(const VulkanCore &other) = delete;
 	VulkanCore(VulkanCore &&other) = delete;
 	virtual ~VulkanCore();

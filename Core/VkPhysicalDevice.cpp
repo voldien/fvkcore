@@ -3,11 +3,14 @@
 
 PhysicalDevice::PhysicalDevice(const std::shared_ptr<VulkanCore> &core, VkPhysicalDevice device)
 	: PhysicalDevice(core->getHandle(), device) {
-	
+
 	vkCore = core;
 }
 
 PhysicalDevice::PhysicalDevice(VkInstance instance, VkPhysicalDevice device) {
+
+	if (vkCore == nullptr)
+		this->vkCore = std::make_shared<VulkanCore>(instance);
 
 	/*  Get feature of the device.  */
 	vkGetPhysicalDeviceFeatures(device, &this->features);

@@ -12,7 +12,8 @@
 #include <getopt.h>
 #include <stdexcept>
 
-VulkanCore::VulkanCore() {
+VulkanCore::VulkanCore() : inst(nullptr) {
+
 	/*  Check for supported extensions.*/
 	this->instanceExtensions = getSupportedExtensions();
 
@@ -23,14 +24,16 @@ VulkanCore::VulkanCore() {
 VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 					   const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext)
 	: VulkanCore() {
-	Initialize(requested_instance_extensions, requested_instance_layers);
+	Initialize(requested_instance_extensions, requested_instance_layers, pNext);
 }
 
-static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-										 uint64_t object, size_t location, int32_t messageCode,
-										 const char *pLayerPrefix, const char *pMessage, void *pUserData) {
-	return VK_TRUE;
-}
+VulkanCore::VulkanCore(VkInstance instance) : VulkanCore() { this->inst = instance; }
+
+// static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+// 										 uint64_t object, size_t location, int32_t messageCode,
+// 										 const char *pLayerPrefix, const char *pMessage, void *pUserData) {
+// 	return VK_TRUE;
+// }
 
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
