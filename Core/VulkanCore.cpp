@@ -29,12 +29,6 @@ VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_i
 
 VulkanCore::VulkanCore(VkInstance instance) : VulkanCore() { this->inst = instance; }
 
-// static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-// 										 uint64_t object, size_t location, int32_t messageCode,
-// 										 const char *pLayerPrefix, const char *pMessage, void *pUserData) {
-// 	return VK_TRUE;
-// }
-
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
 
@@ -147,8 +141,9 @@ std::shared_ptr<PhysicalDevice> VulkanCore::createPhysicalDevice(unsigned int in
 }
 
 VulkanCore::~VulkanCore() {
-	if (inst)
-		vkDestroyInstance(inst, nullptr);
+	if (this->inst)
+		vkDestroyInstance(this->inst, nullptr);
+	this->inst = VK_NULL_HANDLE;
 }
 
 std::vector<VkExtensionProperties> VulkanCore::getSupportedExtensions() {
