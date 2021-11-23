@@ -536,7 +536,7 @@ class VKHelper {
 		vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 	}
 
-	static VkSurfaceKHR createSurface(VkInstance instance) {}
+	static VkSurfaceKHR createSurface([[maybe_unused]] VkInstance instance) { return VK_NULL_HANDLE; }
 };
 
 #endif

@@ -12,7 +12,8 @@
 #include <getopt.h>
 #include <stdexcept>
 
-VulkanCore::VulkanCore() {
+VulkanCore::VulkanCore() : inst(nullptr) {
+
 	/*  Check for supported extensions.*/
 	this->instanceExtensions = getSupportedExtensions();
 
@@ -23,14 +24,10 @@ VulkanCore::VulkanCore() {
 VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 					   const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext)
 	: VulkanCore() {
-	Initialize(requested_instance_extensions, requested_instance_layers);
+	Initialize(requested_instance_extensions, requested_instance_layers, pNext);
 }
 
-static VkBool32 myDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-										 uint64_t object, size_t location, int32_t messageCode,
-										 const char *pLayerPrefix, const char *pMessage, void *pUserData) {
-	return VK_TRUE;
-}
+VulkanCore::VulkanCore(VkInstance instance) : VulkanCore() { this->inst = instance; }
 
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
@@ -45,14 +42,13 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	std::vector<const char *> useValidationLayers;
 
 	/*  Check if exists.    */
-
 	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_instance_extensions.size());
 	for (const std::pair<const char *, bool> &n : requested_instance_extensions) {
 		if (n.second) {
 			if (isInstanceExtensionSupported(n.first)) {
 				usedInstanceExtensionNames.push_back(n.first);
 			} else
-				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}\n", n.first);
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}", n.first);
 		}
 	}
 
@@ -63,7 +59,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 			if (isInstanceLayerSupported(n.first)) {
 				useValidationLayers.push_back(n.first);
 			} else
-				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}\n", n.first);
+				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}", n.first);
 		}
 	}
 
@@ -145,8 +141,9 @@ std::shared_ptr<PhysicalDevice> VulkanCore::createPhysicalDevice(unsigned int in
 }
 
 VulkanCore::~VulkanCore() {
-	if (inst)
-		vkDestroyInstance(inst, nullptr);
+	if (this->inst)
+		vkDestroyInstance(this->inst, nullptr);
+	this->inst = VK_NULL_HANDLE;
 }
 
 std::vector<VkExtensionProperties> VulkanCore::getSupportedExtensions() {

@@ -20,14 +20,17 @@ class VulkanCore {
 
   public:
 	VulkanCore(const std::unordered_map<const char *, bool> &requested_instance_extensions,
-			   const std::unordered_map<const char *, bool> &requested_instance_layers = {{"VK_LAYER_KHRONOS_validation", true}},
+			   const std::unordered_map<const char *, bool> &requested_instance_layers =
+				   {{"VK_LAYER_KHRONOS_validation", true}},
 			   void *pNext = nullptr);
 
 	template <typename T>
-	VulkanCore(const std::vector<std::string> &requested_instance_extensions, const std::vector<std::string> &requested_layers,
-			   const std::string &Name, uint32_t version, const std::string &engine, unsigned int engineVersion,
-			   uint32_t vulkanVersion, VkStructureType type, T &creationNext) noexcept
+	VulkanCore(const std::vector<std::string> &requested_instance_extensions,
+			   const std::vector<std::string> &requested_layers, const std::string &Name, uint32_t version,
+			   const std::string &engine, unsigned int engineVersion, uint32_t vulkanVersion, VkStructureType type,
+			   T &creationNext) noexcept
 		: VulkanCore() {}
+	VulkanCore(VkInstance instance);
 	VulkanCore(const VulkanCore &other) = delete;
 	VulkanCore(VulkanCore &&other) = delete;
 	virtual ~VulkanCore();
@@ -36,7 +39,8 @@ class VulkanCore {
 	VulkanCore &operator=(VulkanCore &&) = delete;
 
 	virtual void Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
-							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext = nullptr);
+							const std::unordered_map<const char *, bool> &requested_instance_layers,
+							void *pNext = nullptr);
 
 	const std::vector<VkExtensionProperties> &getInstanceExtensions() const noexcept {
 		return this->instanceExtensions;

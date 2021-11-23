@@ -22,9 +22,11 @@ SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/includ
 FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
 FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h )
 
+
+
 ADD_LIBRARY(vkcommon-core ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept  Vulkan-Headers PRIVATE ${Vulkan_LIBRARIES} )
+TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
 
 TARGET_COMPILE_FEATURES(vkcommon-core PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
@@ -33,6 +35,9 @@ TARGET_COMPILE_FEATURES(vkcommon-core PUBLIC cxx_constexpr cxx_noexcept cxx_over
 TARGET_INCLUDE_DIRECTORIES(vkcommon-core PUBLIC ${Vulkan_INCLUDE_DIRS}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Core>
 	$<INSTALL_INTERFACE:Core> )
+
+SET_TARGET_PROPERTIES(vkcommon-core PROPERTIES
+		COMPILE_FLAGS "-Wpedantic -Wextra -Wall -Wno-attributes ${Vulkan_CFLAGS_OTHER}")
 
 
 INSTALL(TARGETS vkcommon-core DESTINATION lib)

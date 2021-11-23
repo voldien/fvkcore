@@ -14,7 +14,7 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 	std::vector<const char *> deviceExtensions;
 	deviceExtensions.reserve(requested_extensions.size());
 
-	for (uint32_t j = 0; j < devices.size(); j++) {
+	for (size_t j = 0; j < devices.size(); j++) {
 		const std::shared_ptr<PhysicalDevice> &device = devices[j];
 		/*	Iterate through each extension and add if supported.	*/
 		for (const std::pair<const char *, bool> &n : requested_extensions) {
@@ -28,10 +28,10 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 	}
 
 	uint32_t nrQueues = 1;
-	for (uint32_t j = 0; j < devices.size(); j++) {
+	for (size_t j = 0; j < devices.size(); j++) {
 		const std::shared_ptr<PhysicalDevice> &phDevice = devices[j];
 
-		for (uint32_t i = 0; i < phDevice->getQueueFamilyProperties().size(); i++) {
+		for (size_t i = 0; i < phDevice->getQueueFamilyProperties().size(); i++) {
 			/*  */
 			const VkQueueFamilyProperties &familyProp = phDevice->getQueueFamilyProperties()[i];
 
@@ -54,19 +54,29 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 
 	this->graphics_queue_node_index = graphicsQueueNodeIndex;
 	this->compute_queue_node_index = computeQueueNodeIndex;
-	this->present_queue_node_index = graphics_queue_node_index;
-	this->transfer_queue_node_index = graphics_queue_node_index;
+	this->present_queue_node_index = this->graphics_queue_node_index;
+	this->transfer_queue_node_index = this->graphics_queue_node_index;
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreations(nrQueues);
 	std::vector<float> queuePriorities(1.0f, nrQueues);
+	for (size_t i = 0; i < queueCreations.size(); i++) {
+		VkDeviceQueueCreateInfo &queueCreateInfo = queueCreations[i];
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.pNext = nullptr;
+		queueCreateInfo.flags = 0;
+		queueCreateInfo.queueFamilyIndex = this->graphics_queue_node_index;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriorities[i];
+	}
+
 	// if ((requiredQueues & VK_QUEUE_COMPUTE_BIT) && computeQueueNodeIndex != UINT32_MAX) {
-	VkDeviceQueueCreateInfo &queueCreateInfo = queueCreations[0];
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.pNext = nullptr;
-	queueCreateInfo.flags = 0;
-	queueCreateInfo.queueFamilyIndex = this->graphics_queue_node_index;
-	queueCreateInfo.queueCount = nrQueues;
-	queueCreateInfo.pQueuePriorities = queuePriorities.data();
+	// VkDeviceQueueCreateInfo &queueCreateInfo = queueCreations[0];
+	// queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	// queueCreateInfo.pNext = nullptr;
+	// queueCreateInfo.flags = 0;
+	// queueCreateInfo.queueFamilyIndex = this->graphics_queue_node_index;
+	// queueCreateInfo.queueCount = nrQueues;
+	// queueCreateInfo.pQueuePriorities = queuePriorities.data();
 	//}
 	// std::vector<VkDeviceQueueCreateInfo> queueInfos(1);
 
