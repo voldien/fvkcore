@@ -9,6 +9,99 @@ ELSE()
 	MESSAGE(STATUS "Shared libraries enabled")
 ENDIF(NOT BUILD_SHARED_LIBS)
 
+
+
+#############################################
+#  Extract git hash and branch information.
+#############################################
+OPTION(IGNORE_GIT_HASH "Use Git hash" OFF)
+FIND_PACKAGE(Git QUIET)
+IF(NOT IGNORE_GIT_HASH)
+  IF(GIT_FOUND)
+    # Get the current working branch
+    EXECUTE_PROCESS(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    )
+
+    # Get the latest abbreviated commit hash of the working branch
+    EXECUTE_PROCESS(
+    COMMAND git rev-parse --short=8 HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    )
+
+    #Extract IF there is a tag associated with current commit
+    EXECUTE_PROCESS(
+    COMMAND git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    )
+  ELSE()
+    MESSAGE(FATAL_ERROR "Git must be install on the system in order to extract meta data from GIT version control" )
+  ENDIF()
+ENDIF()
+
+
+##############################
+# Target compiler flags.
+#############################
+IF((CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX) AND NOT CMAKE_COMPILER_IS_MINGW)
+    IF (BUILD_SHARED_LIBS AND CMAKE_SIZEOF_VOID_P EQUAL 8) # -fPIC is only required
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    ENDIF()
+
+    ADD_DEFINITIONS( -Wall -w -Wfatal-errors)
+
+    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+        MESSAGE(STATUS "Compile for release.")
+        ADD_DEFINITIONS( -DNDEBUG )
+        ADD_DEFINITIONS( -O2 )
+        SET(CMAKE_RELEASE TRUE)
+    ELSE()
+        MESSAGE(STATUS "Compile for debug.")
+        ADD_DEFINITIONS( -D_DEBUG )
+        ADD_DEFINITIONS( -g3 -O0 )
+        SET(CMAKE_DEBUG TRUE)
+    ENDIF()
+
+    #
+    IF(BUILD_WITH_COVERAGE)
+        MESSAGE(STATUS "Building with coverage")
+        SET(GCC_COVERAGE_COMPILE_FLAGS "--coverage -fprofile-arcs -ftest-coverage")
+        SET(GCC_COVERAGE_LINK_FLAGS    "-lgcov")
+        SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+        SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+    ENDIF()
+    #
+    IF(BUILD_WITH_PROFILER)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+        SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+    ENDIF()
+ELSEIF(MSVC)
+    # Enable multi-core compilation with MSVC
+    ADD_COMPILE_OPTIONS(/MP)
+ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
+    SET(CMAKE_CXX_FLAGS "-g -fvisibility=hidden -fno-strict-aliasing -Wall -Wno-long-long ${CMAKE_CXX_FLAGS}" )
+    SET(CMAKE_C_FLAGS "-fno-strict-aliasing ${CMAKE_C_FLAGS}")
+ELSEIF( CMAKE_COMPILER_IS_MINGW )
+    SET(CMAKE_CXX_FLAGS "-fvisibility=hidden -fno-strict-aliasing -Wall -Wno-long-long -Wa,-mbig-obj ${CMAKE_CXX_FLAGS}")
+    SET(CMAKE_C_FLAGS "-fno-strict-aliasing ${CMAKE_C_FLAGS}")
+    ADD_DEFINITIONS( -U__STRICT_ANSI__ )
+ENDIF()
+
+######################################
+# Finding and Target Dependencies
+#####################################3
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
 
@@ -18,13 +111,15 @@ IF(Vulkan_FOUND)
 ENDIF()
 
 SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/include)
-
 FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
 FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h )
 
 
-
+#####################################
+# Main Core Library
+######################################
 ADD_LIBRARY(vkcommon-core ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
+
 
 TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
 
@@ -37,7 +132,7 @@ TARGET_INCLUDE_DIRECTORIES(vkcommon-core PUBLIC ${Vulkan_INCLUDE_DIRS}
 	$<INSTALL_INTERFACE:Core> )
 
 SET_TARGET_PROPERTIES(vkcommon-core PROPERTIES
-		COMPILE_FLAGS "-Wpedantic -Wextra -Wall -Wno-attributes ${Vulkan_CFLAGS_OTHER}")
+		COMPILE_FLAGS "${Vulkan_CFLAGS_OTHER}")
 
 
 INSTALL(TARGETS vkcommon-core DESTINATION lib)
