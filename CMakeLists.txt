@@ -9,7 +9,10 @@ ELSE()
 	MESSAGE(STATUS "Shared libraries enabled")
 ENDIF(NOT BUILD_SHARED_LIBS)
 
-
+############################################
+# Adding directory of cmake modules.
+############################################
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules" )
 
 #############################################
 #  Extract git hash and branch information.
