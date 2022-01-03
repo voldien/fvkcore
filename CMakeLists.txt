@@ -12,7 +12,7 @@ ENDIF(NOT BUILD_SHARED_LIBS)
 ############################################
 # Adding directory of cmake modules.
 ############################################
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules" )
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules" )
 
 #############################################
 #  Extract git hash and branch information.
@@ -57,9 +57,6 @@ ENDIF()
 # Target compiler flags.
 #############################
 IF((CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX) AND NOT CMAKE_COMPILER_IS_MINGW)
-    IF (BUILD_SHARED_LIBS AND CMAKE_SIZEOF_VOID_P EQUAL 8) # -fPIC is only required
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    ENDIF()
 
     ADD_DEFINITIONS( -Wall -w -Wfatal-errors)
 
@@ -121,21 +118,24 @@ FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h )
 #####################################
 # Main Core Library
 ######################################
-ADD_LIBRARY(vkcommon-core ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
+ADD_LIBRARY(fvkcore ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
+TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
 
-TARGET_LINK_LIBRARIES(vkcommon-core PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
-
-TARGET_COMPILE_FEATURES(vkcommon-core PUBLIC cxx_constexpr cxx_noexcept cxx_override
+TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
-	cxx_default_function_template_args cxx_std_17)
+	cxx_default_function_template_args cxx_std_11)
 
-TARGET_INCLUDE_DIRECTORIES(vkcommon-core PUBLIC ${Vulkan_INCLUDE_DIRS}
+TARGET_INCLUDE_DIRECTORIES(fvkcore PUBLIC ${Vulkan_INCLUDE_DIRS}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Core>
 	$<INSTALL_INTERFACE:Core> )
 
-SET_TARGET_PROPERTIES(vkcommon-core PROPERTIES
+SET_TARGET_PROPERTIES(fvkcore PROPERTIES
 		COMPILE_FLAGS "${Vulkan_CFLAGS_OTHER}")
 
+IF (BUILD_SHARED_LIBS AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+	SET_PROPERTY(TARGET taskSch PROPERTY POSITION_INDEPENDENT_CODE ON)
+ENDIF()
 
-INSTALL(TARGETS vkcommon-core DESTINATION lib)
+
+INSTALL(TARGETS fvkcore DESTINATION lib)

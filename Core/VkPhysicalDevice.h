@@ -1,5 +1,5 @@
-#ifndef _VULKAN_COMMON_PHYSICAL_DEVICE_H_
-#define _VULKAN_COMMON_PHYSICAL_DEVICE_H_ 1
+#ifndef _FVK_VULKAN_PHYSICAL_DEVICE_H_
+#define _FVK_VULKAN_PHYSICAL_DEVICE_H_ 1
 #include "VKHelper.h"
 #include "VulkanCore.h"
 #include <stdexcept>
@@ -183,7 +183,7 @@ class PhysicalDevice {
 	VkPhysicalDeviceLimits limits;
 	std::vector<VkQueueFamilyProperties> queueFamilyProperties;
 	std::vector<VkExtensionProperties> extensions;
-	std::shared_ptr<VulkanCore> vkCore;
+	std::shared_ptr<VulkanCore> vkCore{nullptr};
 };
 
 #endif
