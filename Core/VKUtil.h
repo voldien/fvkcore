@@ -24,6 +24,20 @@
 #include "Exception.hpp"
 #include <vulkan/vulkan.h>
 
+#ifndef FVK_SCH_EXTERN
+#ifndef FVK_SCH_STATIC
+#ifdef _WIN32
+#define FVK_SCH_EXTERN __declspec(dllimport)
+#elif defined(__GNUC__) && __GNUC__ >= 4 || __clang__
+#define FVK_SCH_EXTERN __attribute__((visibility("default")))
+#else
+#define FVK_SCH_EXTERN
+#endif
+#else
+#define FVK_SCH_EXTERN
+#endif
+#endif
+
 /**
  * @brief
  *

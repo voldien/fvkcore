@@ -36,7 +36,7 @@
  * vulkan related.
  *
  */
-class VKHelper {
+class FVK_SCH_EXTERN VKHelper {
   public:
 	/**
 	 * @brief

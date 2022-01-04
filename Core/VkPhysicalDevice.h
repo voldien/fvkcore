@@ -8,7 +8,7 @@
  * @brief
  *
  */
-class PhysicalDevice {
+class FVK_SCH_EXTERN PhysicalDevice {
   public:
 	PhysicalDevice(const std::shared_ptr<VulkanCore> &core, VkPhysicalDevice device);
 	PhysicalDevice(VkInstance instance, VkPhysicalDevice device);

@@ -33,7 +33,7 @@
  * @brief
  *
  */
-class VKDevice {
+class FVK_SCH_EXTERN VKDevice {
   public:
 	// TODO add support for group device.!
 	/**
