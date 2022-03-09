@@ -22,7 +22,7 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 				if (device->isExtensionSupported(n.first))
 					deviceExtensions.push_back(n.first);
 				else
-					throw cxxexcept::RuntimeException("{} does not support: {}\n", device->getDeviceName(), n.first);
+					throw cxxexcept::RuntimeException("Device '{}' does not support: {}\n", device->getDeviceName(), n.first);
 			}
 		}
 	}
@@ -134,6 +134,6 @@ VKDevice::VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 }
 
 VKDevice::~VKDevice() {
-	if (getHandle() != VK_NULL_HANDLE)
-		vkDestroyDevice(getHandle(), VK_NULL_HANDLE);
+	if (this->getHandle() != VK_NULL_HANDLE)
+		vkDestroyDevice(this->getHandle(), VK_NULL_HANDLE);
 }

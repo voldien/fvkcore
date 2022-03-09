@@ -67,7 +67,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	uint32_t version;
 	VKS_VALIDATE(vkEnumerateInstanceVersion(&version));
 
-	/*	Primary Vulkan instance Object. */
+	/*	Primary Vulkan instance Object. */	//TODO add support to override by user.
 	VkApplicationInfo ai = {};
 	ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	ai.pNext = VK_NULL_HANDLE;
@@ -109,7 +109,7 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	ici.ppEnabledExtensionNames = usedInstanceExtensionNames.data();
 
 	/*	Create Vulkan instance.	*/
-	VKS_VALIDATE(vkCreateInstance(&ici, VK_NULL_HANDLE, &inst));
+	VKS_VALIDATE(vkCreateInstance(&ici, VK_NULL_HANDLE, &this->inst));
 
 	/*	Get number of physical devices. */
 	uint32_t nrPhysicalDevices;
@@ -141,7 +141,7 @@ std::shared_ptr<PhysicalDevice> VulkanCore::createPhysicalDevice(unsigned int in
 }
 
 VulkanCore::~VulkanCore() {
-	if (this->inst)
+	if (this->inst != nullptr)
 		vkDestroyInstance(this->inst, nullptr);
 	this->inst = VK_NULL_HANDLE;
 }
