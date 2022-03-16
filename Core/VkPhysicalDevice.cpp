@@ -1,16 +1,15 @@
 #include "VkPhysicalDevice.h"
 #include "VKHelper.h"
+#include <memory>
 
-PhysicalDevice::PhysicalDevice(const std::shared_ptr<VulkanCore> &core, VkPhysicalDevice device)
-	: PhysicalDevice(core->getHandle(), device) {
+PhysicalDevice::PhysicalDevice(VulkanCore &core, VkPhysicalDevice device) : vkCore(core) { initPhysicalDevice(device); }
 
-	vkCore = core;
-}
+// PhysicalDevice::PhysicalDevice(VkInstance instance, VkPhysicalDevice device)
+// 	: vkCore(std::make_shared<VulkanCore>(instance)) {
+// 	initPhysicalDevice(device);
+// }
 
-PhysicalDevice::PhysicalDevice(VkInstance instance, VkPhysicalDevice device) {
-
-	if (vkCore == nullptr)
-		this->vkCore = std::make_shared<VulkanCore>(instance);
+void PhysicalDevice::initPhysicalDevice(VkPhysicalDevice device) {
 
 	/*  Get feature of the device.  */
 	vkGetPhysicalDeviceFeatures(device, &this->features);

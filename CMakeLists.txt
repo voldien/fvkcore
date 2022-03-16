@@ -139,3 +139,9 @@ ENDIF()
 
 
 INSTALL(TARGETS fvkcore DESTINATION lib)
+
+
+#####################
+# Examples
+#####################
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/examples)

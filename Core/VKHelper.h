@@ -120,6 +120,8 @@ class FVK_SCH_EXTERN VKHelper {
 		vkCmdPipelineBarrier(cmd, src, dest, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
 	}
 
+	static void imageBarrier(){}
+
 	static void createMemory(VkDevice device, VkDeviceSize size, VkMemoryPropertyFlags properties,
 							 const VkMemoryRequirements &memRequirements,
 							 const VkPhysicalDeviceMemoryProperties &memoryProperies, VkDeviceMemory &deviceMemory,
