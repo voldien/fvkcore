@@ -36,7 +36,7 @@
  * vulkan related.
  *
  */
-class FVK_SCH_EXTERN VKHelper {
+class FVK_DECL_EXTERN VKHelper {
   public:
 	/**
 	 * @brief
@@ -120,7 +120,42 @@ class FVK_SCH_EXTERN VKHelper {
 		vkCmdPipelineBarrier(cmd, src, dest, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
 	}
 
-	static void imageBarrier(){}
+	static void bufferBarrier(VkCommandBuffer cmd, VkAccessFlags buffer_src_access, VkAccessFlags buffer_dst_access,
+							  VkBuffer buffer, size_t size, size_t offset, VkPipelineStageFlags src,
+							  VkPipelineStageFlags dest, const char *pNext = nullptr) {
+		VkBufferMemoryBarrier bufferBarrier = {};
+		bufferBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+		bufferBarrier.pNext = pNext;
+		bufferBarrier.srcAccessMask = buffer_src_access;
+		bufferBarrier.dstAccessMask = buffer_dst_access;
+		bufferBarrier.srcQueueFamilyIndex = 0;
+		bufferBarrier.dstQueueFamilyIndex = 0;
+		bufferBarrier.buffer = 0;
+		bufferBarrier.size = 0;
+		bufferBarrier.offset = 0;
+
+		vkCmdPipelineBarrier(cmd, src, dest, 0, 0, nullptr, 1, &bufferBarrier, 0, nullptr);
+	}
+
+	static void imageBarrier(VkCommandBuffer cmd, VkAccessFlags image_src_access, VkAccessFlags image_dst_access,
+							 VkImage image, VkImageLayout old_layout, VkImageLayout new_layout,
+							 const VkImageSubresourceRange &range, VkPipelineStageFlags src, VkPipelineStageFlags dest,
+							 const char *pNext = nullptr) {
+
+		VkImageMemoryBarrier imageMemoryBarrier = {};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.pNext = pNext;
+		imageMemoryBarrier.oldLayout = old_layout;
+		imageMemoryBarrier.newLayout = new_layout;
+		imageMemoryBarrier.image = image;
+		imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.subresourceRange = range;
+		imageMemoryBarrier.srcAccessMask = image_src_access;
+		imageMemoryBarrier.dstAccessMask = image_dst_access;
+
+		vkCmdPipelineBarrier(cmd, src, dest, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+	}
 
 	static void createMemory(VkDevice device, VkDeviceSize size, VkMemoryPropertyFlags properties,
 							 const VkMemoryRequirements &memRequirements,
@@ -195,7 +230,7 @@ class FVK_SCH_EXTERN VKHelper {
 									   VkImageAspectFlags aspectFlags, uint32_t mipLevels);
 
 	//	template<typename T>
-	//TOOD add more params.
+	// TOOD add more params.
 	static void createSampler(VkDevice device, VkSampler &sampler, float maxSamplerAnisotropy = 1.0f,
 							  void *pNext = nullptr) {
 

@@ -36,7 +36,7 @@ class PhysicalDevice;
  * @brief
  *
  */
-class FVK_SCH_EXTERN VulkanCore {
+class FVK_DECL_EXTERN VulkanCore {
   protected:
 	VulkanCore();
 

@@ -24,17 +24,17 @@
 #include "Exception.hpp"
 #include <vulkan/vulkan.h>
 
-#ifndef FVK_SCH_EXTERN
+#ifndef FVK_DECL_EXTERN
 #ifndef FVK_SCH_STATIC
 #ifdef _WIN32
-#define FVK_SCH_EXTERN __declspec(dllimport)
+#define FVK_DECL_EXTERN __declspec(dllimport)
 #elif defined(__GNUC__) && __GNUC__ >= 4 || __clang__
-#define FVK_SCH_EXTERN __attribute__((visibility("default")))
+#define FVK_DECL_EXTERN __attribute__((visibility("default")))
 #else
-#define FVK_SCH_EXTERN
+#define FVK_DECL_EXTERN
 #endif
 #else
-#define FVK_SCH_EXTERN
+#define FVK_DECL_EXTERN
 #endif
 #endif
 
@@ -44,7 +44,7 @@
  * @param symbol
  * @return const char*
  */
-extern "C" FVK_SCH_EXTERN const char *getVKResultSymbol(int symbol);
+extern "C" FVK_DECL_EXTERN const char *getVKResultSymbol(int symbol);
 
 #define VKS_VALIDATE(x)                                                                                                \
 	do {                                                                                                               \

@@ -8,7 +8,7 @@
  * @brief
  *
  */
-class FVK_SCH_EXTERN PhysicalDevice {
+class FVK_DECL_EXTERN PhysicalDevice {
   public:
 	PhysicalDevice(VulkanCore& core, VkPhysicalDevice device);
 	// PhysicalDevice(VkInstance instance, VkPhysicalDevice device);

@@ -23,7 +23,7 @@
 #define _FVK_VK_DEBUG_H_ 1
 #include "VKUtil.h"
 
-class FVK_SCH_EXTERN VKDebug {
+class FVK_DECL_EXTERN VKDebug {
   public:
 	template <typename T> static void setName(VkDevice device, T vk_object, const char *name) {
 		if (pfnDebugMarkerSetObjectName) {
