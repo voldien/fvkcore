@@ -61,12 +61,12 @@ class FVK_DECL_EXTERN VKDevice {
 	 * @return true
 	 * @return false
 	 */
-	bool isGroupDevice() const noexcept { return getPhysicalDevices().size() > 0; }
-	const std::vector<std::shared_ptr<PhysicalDevice>> &getPhysicalDevices() const noexcept { return physicalDevices; }
+	bool isGroupDevice() const noexcept { return this->getPhysicalDevices().size() > 0; }
+	const std::vector<std::shared_ptr<PhysicalDevice>> &getPhysicalDevices() const noexcept { return this->physicalDevices; }
 
 	unsigned int getNrPhysicalDevices() const noexcept { return this->physicalDevices.size(); }
 	const std::shared_ptr<PhysicalDevice> &getPhysicalDevice(unsigned int index) const {
-		return physicalDevices[index];
+		return this->physicalDevices[index];
 	}
 
 	VkDevice getHandle() const noexcept { return this->logicalDevice; }

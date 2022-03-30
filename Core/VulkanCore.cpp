@@ -119,13 +119,8 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	physicalDevices.resize(nrPhysicalDevices);
 	VKS_VALIDATE(vkEnumeratePhysicalDevices(this->inst, &nrPhysicalDevices, &this->physicalDevices[0]));
 
-	/*	*/
-	uint32_t nrPhysicalDeviceGroupCount;
-	VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->inst, &nrPhysicalDeviceGroupCount, VK_NULL_HANDLE));
+	this->getDeviceGroupProperties();
 
-	/*	TODO only if extension being requested.	*/
-	std::vector<VkPhysicalDeviceGroupProperties> phyiscalGroupDevices(nrPhysicalDeviceGroupCount);
-	VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->inst, &nrPhysicalDeviceGroupCount, phyiscalGroupDevices.data()));
 }
 
 std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices() const {

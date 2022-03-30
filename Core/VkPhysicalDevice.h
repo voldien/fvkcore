@@ -10,7 +10,7 @@
  */
 class FVK_DECL_EXTERN PhysicalDevice {
   public:
-	PhysicalDevice(VulkanCore& core, VkPhysicalDevice device);
+	PhysicalDevice(VulkanCore &core, VkPhysicalDevice device);
 	// PhysicalDevice(VkInstance instance, VkPhysicalDevice device);
 	PhysicalDevice(const PhysicalDevice &) = delete;
 	PhysicalDevice(PhysicalDevice &&) = delete;
@@ -175,6 +175,8 @@ class FVK_DECL_EXTERN PhysicalDevice {
 
 	const char *getDeviceName() const noexcept;
 
+	VulkanCore &getInstance() const noexcept { return this->vkCore; }
+
   protected:
 	void initPhysicalDevice(VkPhysicalDevice device);
 
@@ -186,7 +188,7 @@ class FVK_DECL_EXTERN PhysicalDevice {
 	VkPhysicalDeviceLimits limits;
 	std::vector<VkQueueFamilyProperties> queueFamilyProperties;
 	std::vector<VkExtensionProperties> extensions;
-	VulkanCore& vkCore;
+	VulkanCore &vkCore;
 };
 
 #endif
