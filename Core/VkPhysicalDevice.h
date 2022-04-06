@@ -154,7 +154,7 @@ class FVK_DECL_EXTERN PhysicalDevice {
 		feature.pNext = &requestFeature;
 
 		requestFeature.sType = type;
-		vkGetPhysicalDeviceFeatures2(getHandle(), &feature);
+		vkGetPhysicalDeviceFeatures2(this->getHandle(), &feature);
 	}
 
 	/**

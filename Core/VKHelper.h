@@ -124,15 +124,15 @@ class FVK_DECL_EXTERN VKHelper {
 							  VkBuffer buffer, size_t size, size_t offset, VkPipelineStageFlags src,
 							  VkPipelineStageFlags dest, const char *pNext = nullptr) {
 		VkBufferMemoryBarrier bufferBarrier = {};
-		bufferBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+		bufferBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 		bufferBarrier.pNext = pNext;
 		bufferBarrier.srcAccessMask = buffer_src_access;
 		bufferBarrier.dstAccessMask = buffer_dst_access;
 		bufferBarrier.srcQueueFamilyIndex = 0;
 		bufferBarrier.dstQueueFamilyIndex = 0;
-		bufferBarrier.buffer = 0;
-		bufferBarrier.size = 0;
-		bufferBarrier.offset = 0;
+		bufferBarrier.buffer = buffer;
+		bufferBarrier.size = size;
+		bufferBarrier.offset = offset;
 
 		vkCmdPipelineBarrier(cmd, src, dest, 0, 0, nullptr, 1, &bufferBarrier, 0, nullptr);
 	}

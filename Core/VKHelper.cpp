@@ -42,10 +42,11 @@ void VKHelper::createBuffer(VkDevice device, VkDeviceSize size, const VkPhysical
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
 	const auto typeIndex = findMemoryType(memoryProperies, memRequirements.memoryTypeBits, properties);
-	if (typeIndex)
+	if (typeIndex) {
 		allocInfo.memoryTypeIndex = typeIndex.value();
-	else
+	} else {
 		throw cxxexcept::RuntimeException("Could not find valid memory index");
+	}
 
 	/**/
 	VKS_VALIDATE(vkAllocateMemory(device, &allocInfo, NULL, &bufferMemory));
