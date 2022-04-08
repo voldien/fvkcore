@@ -103,7 +103,9 @@ ENDIF()
 # Finding and Target Dependencies
 #####################################3
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
+IF(NOT TARGET cxxexcept)
+    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
+ENDIF()
 
 FIND_PACKAGE(Vulkan QUIET)
 IF(Vulkan_FOUND)
