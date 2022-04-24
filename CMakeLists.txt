@@ -126,7 +126,7 @@ TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRA
 
 TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
-	cxx_default_function_template_args cxx_std_11)
+	cxx_default_function_template_args cxx_std_17)
 
 TARGET_INCLUDE_DIRECTORIES(fvkcore PUBLIC ${Vulkan_INCLUDE_DIRS}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Core>
