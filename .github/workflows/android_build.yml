@@ -11,10 +11,9 @@ env:
 
 jobs:
   android_build:
-runs-on: ubuntu-latest
-  name: "C++ FVKCore - Android"
-
-  steps:
+    runs-on: ubuntu-latest
+    name: "C++ FVKCore - Android"
+    steps:
     - uses: actions/checkout@v2
       with:
         submodules: "recursive"
