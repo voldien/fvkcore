@@ -63,6 +63,8 @@ ENDIF()
 FIND_PACKAGE(Vulkan QUIET)
 IF(Vulkan_FOUND)
     MESSAGE(STATUS "Vulkan: ${Vulkan_LIBRARY}")
+ELSE()
+    SET(Vulkan_LIBRARIES vulkan)
 ENDIF()
 
 
@@ -116,7 +118,7 @@ ENDIF()
 # Source code files.
 #####################################
 
-SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/include)
+#SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/include)
 FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.cpp)
 FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h )
 
@@ -125,7 +127,7 @@ FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h )
 ######################################
 ADD_LIBRARY(fvkcore ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
+TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan::Headers ${Vulkan_LIBRARIES} )
 
 TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
