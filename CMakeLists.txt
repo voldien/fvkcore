@@ -52,6 +52,19 @@ IF(NOT IGNORE_GIT_HASH)
   ENDIF()
 ENDIF()
 
+######################################
+# Finding and Target Dependencies
+#####################################3
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
+IF(NOT TARGET cxxexcept)
+    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
+ENDIF()
+
+FIND_PACKAGE(Vulkan QUIET)
+IF(Vulkan_FOUND)
+    MESSAGE(STATUS "Vulkan: ${Vulkan_LIBRARY}")
+ENDIF()
+
 
 ##############################
 # Target compiler flags.
@@ -99,23 +112,13 @@ ELSEIF( CMAKE_COMPILER_IS_MINGW )
     ADD_DEFINITIONS( -U__STRICT_ANSI__ )
 ENDIF()
 
-######################################
-# Finding and Target Dependencies
-#####################################3
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
-IF(NOT TARGET cxxexcept)
-    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
-ENDIF()
-
-FIND_PACKAGE(Vulkan QUIET)
-IF(Vulkan_FOUND)
-    MESSAGE(STATUS "Vulkan: ${Vulkan_LIBRARY}")
-ENDIF()
+#####################################
+# Source code files.
+#####################################
 
 SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/include)
-FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
-FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h )
-
+FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.cpp)
+FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h )
 
 #####################################
 # Main Core Library
@@ -129,8 +132,8 @@ TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept cxx_override
 	cxx_default_function_template_args cxx_std_17)
 
 TARGET_INCLUDE_DIRECTORIES(fvkcore PUBLIC ${Vulkan_INCLUDE_DIRS}
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Core>
-	$<INSTALL_INTERFACE:Core> )
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/fvkcore>
+	$<INSTALL_INTERFACE:fvkcore> )
 
 SET_TARGET_PROPERTIES(fvkcore PROPERTIES
 		COMPILE_FLAGS "${Vulkan_CFLAGS_OTHER}")
@@ -139,9 +142,7 @@ IF (BUILD_SHARED_LIBS AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 	SET_PROPERTY(TARGET fvkcore PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF()
 
-
 INSTALL(TARGETS fvkcore DESTINATION lib)
-
 
 #####################
 # Examples

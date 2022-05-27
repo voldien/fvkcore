@@ -22,19 +22,21 @@
 #ifndef _FVK_VK_DEBUG_H_
 #define _FVK_VK_DEBUG_H_ 1
 #include "VKUtil.h"
+namespace fvkcore {
 
-class FVK_DECL_EXTERN VKDebug {
-  public:
-	template <typename T> static void setName(VkDevice device, T vk_object, const char *name) {
-		if (pfnDebugMarkerSetObjectName) {
-			VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-			nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
-			nameInfo.objectType = VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT;
-			nameInfo.object = vk_object;
-			nameInfo.pObjectName = name;
-			pfnDebugMarkerSetObjectName(device, &nameInfo);
+	class FVK_DECL_EXTERN VKDebug {
+	  public:
+		template <typename T> static void setName(VkDevice device, T vk_object, const char *name) {
+			if (pfnDebugMarkerSetObjectName) {
+				VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+				nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+				nameInfo.objectType = VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT;
+				nameInfo.object = vk_object;
+				nameInfo.pObjectName = name;
+				pfnDebugMarkerSetObjectName(device, &nameInfo);
+			}
 		}
-	}
-};
+	};
+} // namespace fvkcore
 
 #endif

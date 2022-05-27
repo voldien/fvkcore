@@ -3,6 +3,8 @@
 
 #include <vulkan/vulkan.h>
 
+using namespace fvkcore;
+
 std::optional<uint32_t> VKHelper::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
 												 VkMemoryPropertyFlags properties) {
 	VkPhysicalDeviceMemoryProperties memProperties;

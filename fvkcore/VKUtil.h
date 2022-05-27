@@ -21,7 +21,7 @@
  */
 #ifndef _FVK_VK_UTILS_H_
 #define _FVK_VK_UTILS_H_ 1
-#include "Exception.hpp"
+#include <Exception.hpp>
 #include <vulkan/vulkan.h>
 
 #ifndef FVK_DECL_EXTERN
@@ -37,14 +37,17 @@
 #define FVK_DECL_EXTERN
 #endif
 #endif
+namespace fvkcore {
 
-/**
- * @brief
- *
- * @param symbol
- * @return const char*
- */
-extern "C" FVK_DECL_EXTERN const char *getVKResultSymbol(int symbol);
+	/**
+	 * @brief
+	 *
+	 * @param symbol
+	 * @return const char*
+	 */
+	extern FVK_DECL_EXTERN const char *getVKResultSymbol(int symbol);
+
+} // namespace fvkcore
 
 #define VKS_VALIDATE(x)                                                                                                \
 	do {                                                                                                               \

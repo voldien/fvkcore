@@ -12,6 +12,8 @@
 #include <getopt.h>
 #include <stdexcept>
 
+using namespace fvkcore;
+
 VulkanCore::VulkanCore() : inst(nullptr) {
 
 	/*  Check for supported extensions.*/
@@ -120,7 +122,6 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	VKS_VALIDATE(vkEnumeratePhysicalDevices(this->inst, &nrPhysicalDevices, &this->physicalDevices[0]));
 
 	this->getDeviceGroupProperties();
-
 }
 
 std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices() const {

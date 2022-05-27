@@ -1,6 +1,8 @@
 #include "VKDevice.h"
 #include "Exception.hpp"
 
+using namespace fvkcore;
+
 VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &devices,
 				   const std::unordered_map<const char *, bool> &requested_extensions, VkQueueFlags requiredQueues) {
 

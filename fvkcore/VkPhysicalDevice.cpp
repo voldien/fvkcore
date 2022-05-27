@@ -2,6 +2,8 @@
 #include "VKHelper.h"
 #include <memory>
 
+using namespace fvkcore;
+
 PhysicalDevice::PhysicalDevice(VulkanCore &core, VkPhysicalDevice device) : vkCore(core) { initPhysicalDevice(device); }
 
 // PhysicalDevice::PhysicalDevice(VkInstance instance, VkPhysicalDevice device)
