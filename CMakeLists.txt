@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 3.8 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.6 )
 PROJECT(frag-vulkan-core)
 
 OPTION(BUILD_SHARED_LIBS "Build package with shared libraries." ON)
