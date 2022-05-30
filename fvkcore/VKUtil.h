@@ -53,7 +53,8 @@ namespace fvkcore {
 	do {                                                                                                               \
 		VkResult _err = x;                                                                                             \
 		if (_err != VK_SUCCESS) {                                                                                      \
-			throw cxxexcept::RuntimeException("{} {} {} - {}", __FILE__, __LINE__, _err, getVKResultSymbol(_err));     \
+			throw cxxexcept::RuntimeException("{} {} {} - {}", __FILE__, __LINE__, _err,                               \
+											  fvkcore::getVKResultSymbol(_err));                                       \
 		}                                                                                                              \
 	} while (0)
 
