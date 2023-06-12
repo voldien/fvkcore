@@ -1,6 +1,28 @@
+/*
+ * Copyright (c) 2021 Valdemar Lindberg
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 #pragma once
 #include "VKHelper.h"
 #include "VulkanCore.h"
+#include "vulkan/vulkan_core.h"
 #include <stdexcept>
 
 namespace fvkcore {
@@ -28,7 +50,7 @@ namespace fvkcore {
 
 		inline const VkPhysicalDeviceDriverProperties getDeviceDriverProperties() {
 			VkPhysicalDeviceDriverProperties devceProp;
-			getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES, devceProp);
+			this->getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES, devceProp);
 			return devceProp;
 		}
 
@@ -39,6 +61,7 @@ namespace fvkcore {
 		}
 
 		unsigned int getNrQueueFamilyProperties() const noexcept { return this->queueFamilyProperties.size(); }
+
 		/**
 		 * @brief Get the Queue Family Properties object
 		 * Get all the support family properties.
@@ -46,7 +69,23 @@ namespace fvkcore {
 		 * @return const std::vector<VkQueueFamilyProperties>&
 		 */
 		const std::vector<VkQueueFamilyProperties> &getQueueFamilyProperties() const noexcept {
-			return queueFamilyProperties;
+			return this->queueFamilyProperties;
+		}
+
+		/**
+		 * @brief Get the Queue Family object
+		 *
+		 * @param queueFlag
+		 * @return std::vector<VkQueueFamilyProperties>
+		 */
+		std::vector<VkQueueFamilyProperties> getQueueFamily(VkQueueFlags queueFlag) {
+			std::vector<VkQueueFamilyProperties> family;
+			for (const VkQueueFamilyProperties &a : this->getQueueFamilyProperties()) {
+				if (a.queueFlags & queueFlag) {
+					family.push_back(a);
+				}
+			}
+			return family;
 		}
 
 		/**
@@ -227,7 +266,6 @@ namespace fvkcore {
 		VkPhysicalDeviceFeatures features;
 		VkPhysicalDeviceMemoryProperties memProperties;
 		VkPhysicalDeviceProperties properties;
-		VkPhysicalDeviceLimits limits;
 		std::vector<VkQueueFamilyProperties> queueFamilyProperties;
 		std::vector<VkExtensionProperties> extensions;
 

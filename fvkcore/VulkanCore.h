@@ -21,6 +21,7 @@
  */
 #pragma once
 #include "VKUtil.h"
+#include "vulkan/vulkan_core.h"
 #include <algorithm>
 #include <cstring>
 #include <memory>
@@ -73,6 +74,13 @@ namespace fvkcore {
 
 		const std::vector<VkLayerProperties> &getInstanceLayers() const noexcept { return this->instanceLayers; }
 
+		/**
+		 * @brief
+		 *
+		 * @param extension
+		 * @return true
+		 * @return false
+		 */
 		bool isInstanceExtensionSupported(const std::string &extension) const {
 			return isInstanceExtensionSupported(this->getInstanceExtensions(), extension);
 		}
@@ -104,12 +112,20 @@ namespace fvkcore {
 		 */
 		std::vector<VkPhysicalDeviceGroupProperties> getDeviceGroupProperties() const {
 
-			uint32_t nrGroups;
-			VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->getHandle(), &nrGroups, nullptr));
-			std::vector<VkPhysicalDeviceGroupProperties> prop(nrGroups);
-			if (nrGroups > 0)
-				VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->getHandle(), &nrGroups, prop.data()));
-			return prop;
+			uint32_t nrGroups = 0;
+			VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->getHandle(), &nrGroups, VK_NULL_HANDLE));
+
+			std::vector<VkPhysicalDeviceGroupProperties> group_properties(nrGroups);
+			if (nrGroups > 0) {
+				for (size_t i = 0; i < group_properties.size(); i++) {
+					group_properties[i].sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GROUP_PROPERTIES;
+					group_properties[i].pNext = VK_NULL_HANDLE;
+				}
+
+				VKS_VALIDATE(vkEnumeratePhysicalDeviceGroups(this->getHandle(), &nrGroups, group_properties.data()));
+			}
+
+			return group_properties;
 		}
 
 		/**
@@ -179,10 +195,12 @@ namespace fvkcore {
 		}
 
 	  protected:
+		VkInstance inst = VK_NULL_HANDLE;
+
 		/*	*/
 		std::vector<VkExtensionProperties> instanceExtensions;
 		std::vector<VkLayerProperties> instanceLayers;
-		VkInstance inst;
+
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkDebugReportCallbackEXT debugReport;
 
@@ -192,6 +210,7 @@ namespace fvkcore {
 
 		uint32_t queue_count;
 		std::vector<VkPhysicalDevice> physicalDevices;
-	};
+		
+	}; // namespace fvkcore
 
 } // namespace fvkcore

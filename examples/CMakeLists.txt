@@ -1,7 +1,9 @@
-
-
 FILE(GLOB EXAMPLE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-
 
 ADD_EXECUTABLE(createDeviceExample ${EXAMPLE_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(createDeviceExample fvkcore)
+
+ADD_DEPENDENCIES(createDeviceExample fvkcore)
+
+#ADD_EXECUTABLE(createDeviceExample ${EXAMPLE_SOURCE_FILES})
+#TARGET_LINK_LIBRARIES(createDeviceExample fvkcore)

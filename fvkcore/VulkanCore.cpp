@@ -34,32 +34,26 @@ VulkanCore::VulkanCore(VkInstance instance) : VulkanCore() { this->inst = instan
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
 
-	// TODO remove
-	std::vector<const char *> usedInstanceExtensionNames = {
-		/*	*/
-		//		VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
-		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-		VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-		VK_KHR_DISPLAY_EXTENSION_NAME,
-	};
+	std::vector<const char *> usedInstanceExtensionNames = {};
 	std::vector<const char *> useValidationLayers;
 
 	/*  Check if exists.    */
 	usedInstanceExtensionNames.reserve(usedInstanceExtensionNames.size() + requested_instance_extensions.size());
-	for (const std::pair<const char *, bool> &n : requested_instance_extensions) {
+	for (const std::pair<const char *, bool> n : requested_instance_extensions) {
 		if (n.second) {
-			if (isInstanceExtensionSupported(n.first)) {
+			if (this->isInstanceExtensionSupported(n.first)) {
 				usedInstanceExtensionNames.push_back(n.first);
-			} else
+			} else {
 				throw cxxexcept::RuntimeException("Vulkan Instance does not support Extension: {}", n.first);
+			}
 		}
 	}
 
 	/*	*/
 	useValidationLayers.reserve(useValidationLayers.size() + requested_instance_layers.size());
-	for (const std::pair<const char *, bool> &n : requested_instance_layers) {
+	for (const std::pair<const char *, bool> n : requested_instance_layers) {
 		if (n.second) {
-			if (isInstanceLayerSupported(n.first)) {
+			if (this->isInstanceLayerSupported(n.first)) {
 				useValidationLayers.push_back(n.first);
 			} else {
 				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}", n.first);
@@ -80,24 +74,6 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 	ai.pEngineName = "Vulkan Sample Engine";
 	ai.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	ai.apiVersion = version;
-
-	// VkDebugReportCallbackCreateInfoEXT callbackCreateInfoExt{};
-	// callbackCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT; // sType
-	// callbackCreateInfoExt.pNext = NULL;													   // pNext
-	// callbackCreateInfoExt.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT |						   // flags
-	// 							  VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	// callbackCreateInfoExt.pfnCallback = &myDebugReportCallbackEXT; // myOutputDebugString, // pfnCallback
-	// callbackCreateInfoExt.pUserData = VK_NULL_HANDLE;			   // pUserData
-	// VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoExt{};
-	// debugUtilsMessengerCreateInfoExt.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	// debugUtilsMessengerCreateInfoExt.pNext = &callbackCreateInfoExt;
-	// VkValidationCheckEXT validationCheckExt[] = {VK_VALIDATION_CHECK_ALL_EXT};
-	// VkValidationFlagsEXT validationFlagsExt{};
-
-	// validationFlagsExt.sType = VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT;
-	// validationFlagsExt.pNext = pNext; //&debugUtilsMessengerCreateInfoExt,
-	// validationFlagsExt.disabledValidationCheckCount = 1;
-	// validationFlagsExt.pDisabledValidationChecks = validationCheckExt;
 
 	/*	Prepare the instance object. */
 	VkInstanceCreateInfo ici = {};
@@ -127,9 +103,9 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 }
 
 std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices() const {
-	std::vector<std::shared_ptr<PhysicalDevice>> _physicalDevices(getPhysicalDevices().size());
-	for (uint32_t i = 0; i < getPhysicalDevices().size(); i++) {
-		_physicalDevices[i] = std::move(createPhysicalDevice(i));
+	std::vector<std::shared_ptr<PhysicalDevice>> _physicalDevices(this->getPhysicalDevices().size());
+	for (uint32_t i = 0; i < this->getPhysicalDevices().size(); i++) {
+		_physicalDevices[i] = createPhysicalDevice(i);
 	}
 	return _physicalDevices;
 }
@@ -152,7 +128,7 @@ std::vector<VkExtensionProperties> VulkanCore::getSupportedExtensions() {
 	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, VK_NULL_HANDLE));
 	instanceExtensions.resize(extensionCount);
 	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, instanceExtensions.data()));
-	
+
 	return instanceExtensions;
 }
 std::vector<VkLayerProperties> VulkanCore::getSupportedLayers() {

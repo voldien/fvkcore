@@ -24,6 +24,8 @@
 #include "VKUtil.h"
 #include "VkPhysicalDevice.h"
 #include "VulkanCore.h"
+#include "vulkan/vulkan_core.h"
+#include <cstdint>
 #include <fmt/core.h>
 #include <optional>
 #include <unordered_map>
@@ -36,7 +38,6 @@ namespace fvkcore {
 	 */
 	class FVK_DECL_EXTERN VKDevice {
 	  public:
-		// TODO add support for group device.!
 		/**
 		 * @brief Construct a new VKDevice object
 		 *
@@ -46,12 +47,30 @@ namespace fvkcore {
 		 */
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT);
-		// TODO add std::function for override the select GPU.
+				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT, const void* pNext = nullptr);
 
+		/**
+		 * @brief Construct a new VKDevice object
+		 * 
+		 * @param physicalDevice 
+		 * @param requested_extensions 
+		 * @param requiredQueues 
+		 */
 		VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT);
+				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT, const void* pNext = nullptr);
+
+		/**
+		 * @brief Construct a new VKDevice object
+		 * 
+		 * @param physicalDevices 
+		 * @param requested_extensions 
+		 * @param queues 
+		 */
+		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
+				 const std::unordered_map<const char *, bool> &requested_extensions,
+				 const std::vector<VkDeviceQueueCreateInfo> &queues, const void* pNext = nullptr);
+
 		VKDevice(const VKDevice &) = delete;
 		VKDevice(VKDevice &&) = delete;
 		~VKDevice();
@@ -143,13 +162,14 @@ namespace fvkcore {
 			return pool;
 		}
 
-		void submitCommands(VkQueue queue, const std::vector<VkCommandBuffer> &cmd,
-							const std::vector<VkSemaphore> &waitSemaphores = {},
-							const std::vector<VkSemaphore> &signalSempores = {}, VkFence fence = VK_NULL_HANDLE,
-							const std::vector<VkPipelineStageFlags> &waitStages = {
-								VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT}) {
+		void submitCommands(
+			VkQueue queue, const std::vector<VkCommandBuffer> &cmd, const std::vector<VkSemaphore> &waitSemaphores = {},
+			const std::vector<VkSemaphore> &signalSempores = {}, VkFence fence = VK_NULL_HANDLE,
+			const std::vector<VkPipelineStageFlags> &waitStages = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
+			const void *pNext = nullptr) {
 			VkSubmitInfo submitInfo = {};
 			submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submitInfo.pNext = pNext;
 
 			submitInfo.waitSemaphoreCount = waitSemaphores.size();
 			submitInfo.pWaitSemaphores = waitSemaphores.data();
@@ -178,7 +198,7 @@ namespace fvkcore {
 			allocInfo.commandPool = commandPool;
 			allocInfo.commandBufferCount = nrCmdBuffers;
 
-			VKS_VALIDATE(vkAllocateCommandBuffers(getHandle(), &allocInfo, cmdBuffers.data()));
+			VKS_VALIDATE(vkAllocateCommandBuffers(this->getHandle(), &allocInfo, cmdBuffers.data()));
 
 			return cmdBuffers;
 		}
@@ -220,8 +240,15 @@ namespace fvkcore {
 		 */
 		bool isFormatSupported(VkFormat format, VkImageType imageType, VkImageTiling tiling,
 							   VkImageUsageFlags usage) const noexcept {
+
 			/*	Check either as the group or the physical device.	*/
-			return this->physicalDevices[0]->isFormatSupported(format, imageType, tiling, usage);
+			return this->getPhysicalDevice(0)->isFormatSupported(format, imageType, tiling, usage);
+		}
+
+		VkQueue getQueue(uint32_t queueFamilyIndex, uint32_t queueIndex) const {
+			VkQueue queue;
+			vkGetDeviceQueue(this->getHandle(), queueFamilyIndex, 0, &queue);
+			return queue;
 		}
 
 	  private:
@@ -232,12 +259,12 @@ namespace fvkcore {
 		uint32_t sparse_queue_node_index;
 
 		std::vector<std::shared_ptr<PhysicalDevice>> physicalDevices;
-		VkDevice logicalDevice;
+		VkDevice logicalDevice = VK_NULL_HANDLE;
 
-		VkQueue graphicsQueue;
-		VkQueue presentQueue;
-		VkQueue computeQueue;
-		VkQueue transferQueue;
-		VkQueue sparseQueue;
+		VkQueue graphicsQueue = VK_NULL_HANDLE;
+		VkQueue presentQueue = VK_NULL_HANDLE;
+		VkQueue computeQueue = VK_NULL_HANDLE;
+		VkQueue transferQueue = VK_NULL_HANDLE;
+		VkQueue sparseQueue = VK_NULL_HANDLE;
 	};
 } // namespace fvkcore
