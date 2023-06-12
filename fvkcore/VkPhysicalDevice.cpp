@@ -25,6 +25,7 @@ void PhysicalDevice::initPhysicalDevice(VkPhysicalDevice device) {
 		/*	Get device properties.	*/
 		vkGetPhysicalDeviceProperties(device, &this->properties);
 	}
+
 	/*	*/
 	{
 		/*  Select queue family.    */
@@ -36,10 +37,10 @@ void PhysicalDevice::initPhysicalDevice(VkPhysicalDevice device) {
 
 	/*	*/
 	{
-		uint32_t nrExtensions;
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, nullptr);
-		this->extensions.resize(nrExtensions);
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, this->extensions.data());
+		uint32_t nrDeviceExtensions;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrDeviceExtensions, nullptr);
+		this->extensions.resize(nrDeviceExtensions);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrDeviceExtensions, this->extensions.data());
 	}
 
 	this->mdevice = device;

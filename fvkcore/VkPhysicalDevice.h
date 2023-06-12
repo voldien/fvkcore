@@ -56,11 +56,11 @@ namespace fvkcore {
 
 		inline const VkPhysicalDeviceSubgroupProperties getDeviceSubGroupProperties() {
 			VkPhysicalDeviceSubgroupProperties devceProp;
-			getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES, devceProp);
+			this->getProperties(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES, devceProp);
 			return devceProp;
 		}
 
-		unsigned int getNrQueueFamilyProperties() const noexcept { return this->queueFamilyProperties.size(); }
+		size_t getNrQueueFamilyProperties() const noexcept { return this->queueFamilyProperties.size(); }
 
 		/**
 		 * @brief Get the Queue Family Properties object
