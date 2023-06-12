@@ -1,8 +1,8 @@
-#ifndef _FVK_VULKAN_PHYSICAL_DEVICE_H_
-#define _FVK_VULKAN_PHYSICAL_DEVICE_H_ 1
+#pragma once
 #include "VKHelper.h"
 #include "VulkanCore.h"
 #include <stdexcept>
+
 namespace fvkcore {
 
 	/**
@@ -49,10 +49,18 @@ namespace fvkcore {
 			return queueFamilyProperties;
 		}
 
+		/**
+		 * @brief Check if physical device has support for any the queue types.
+		 *
+		 * @param queueFlag
+		 * @return true
+		 * @return false
+		 */
 		bool isQueueSupported(VkQueueFlags queueFlag) const noexcept {
-			for (const VkQueueFamilyProperties &a : getQueueFamilyProperties()) {
-				if (a.queueFlags & queueFlag)
+			for (const VkQueueFamilyProperties &a : this->getQueueFamilyProperties()) {
+				if (a.queueFlags & queueFlag) {
 					return true;
+				}
 			}
 			return false;
 		}
@@ -94,10 +102,26 @@ namespace fvkcore {
 			}
 		}
 
+		/**
+		 * @brief Get the Format Properties object
+		 *
+		 * @param format
+		 * @param props
+		 */
 		void getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept {
 			vkGetPhysicalDeviceFormatProperties(this->getHandle(), format, &props);
 		}
 
+		/**
+		 * @brief Get the Supported Format object
+		 *
+		 * @param supported
+		 * @param candidates
+		 * @param tiling
+		 * @param features
+		 * @return true
+		 * @return false
+		 */
 		bool getSupportedFormat(VkFormat &supported, const std::vector<VkFormat> &candidates, VkImageTiling tiling,
 								VkFormatFeatureFlags features) const {
 			supported = VKHelper::findSupportedFormat(this->getHandle(), candidates, tiling, features);
@@ -118,6 +142,11 @@ namespace fvkcore {
 			return false;
 		}
 
+		/**
+		 * @brief Get the Handle object
+		 *
+		 * @return VkPhysicalDevice
+		 */
 		VkPhysicalDevice getHandle() const noexcept { return this->mdevice; }
 
 		/**
@@ -128,17 +157,17 @@ namespace fvkcore {
 		const std::vector<VkExtensionProperties> &getExtensions() const noexcept { return this->extensions; }
 
 		/**
-		 * @brief
+		 * @brief Check if extension is support by the physical device.
 		 *
 		 * @param extension
 		 * @return true
 		 * @return false
 		 */
 		bool isExtensionSupported(const std::string &extension) const noexcept {
-			return std::find_if(getExtensions().begin(), getExtensions().end(),
+			return std::find_if(this->getExtensions().begin(), this->getExtensions().end(),
 								[extension](const VkExtensionProperties &device_extension) {
 									return std::strcmp(device_extension.extensionName, extension.c_str()) == 0;
-								}) != getExtensions().cend();
+								}) != this->getExtensions().cend();
 		}
 
 		/**
@@ -156,6 +185,13 @@ namespace fvkcore {
 
 			requestFeature.sType = type;
 			vkGetPhysicalDeviceFeatures2(this->getHandle(), &feature);
+		}
+
+		VkPhysicalDeviceFeatures getFeature() noexcept {
+
+			VkPhysicalDeviceFeatures features;
+			vkGetPhysicalDeviceFeatures(this->getHandle(), &features);
+			return features;
 		}
 
 		/**
@@ -176,6 +212,11 @@ namespace fvkcore {
 
 		const char *getDeviceName() const noexcept;
 
+		/**
+		 * @brief Get Vulkan instance core associated with the physical device.
+		 *
+		 * @return VulkanCore&
+		 */
 		VulkanCore &getInstance() const noexcept { return this->vkCore; }
 
 	  protected:
@@ -189,8 +230,7 @@ namespace fvkcore {
 		VkPhysicalDeviceLimits limits;
 		std::vector<VkQueueFamilyProperties> queueFamilyProperties;
 		std::vector<VkExtensionProperties> extensions;
+
 		VulkanCore &vkCore;
 	};
 } // namespace fvkcore
-
-#endif

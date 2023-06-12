@@ -19,8 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef _FVK_VULKAN_CORE_H_
-#define _FVK_VULKAN_CORE_H_ 1
+#pragma once
 #include "VKUtil.h"
 #include <algorithm>
 #include <cstring>
@@ -47,6 +46,8 @@ namespace fvkcore {
 				   const std::unordered_map<const char *, bool> &requested_instance_layers =
 					   {{"VK_LAYER_KHRONOS_validation", true}},
 				   void *pNext = nullptr);
+
+		// VulkanCore(VkInstanceCreateInfo& c);
 
 		template <typename T>
 		VulkanCore(const std::vector<std::string> &requested_instance_extensions,
@@ -77,7 +78,7 @@ namespace fvkcore {
 		}
 
 		bool isInstanceLayerSupported(const std::string &layer) const {
-			return isInstanceLayerSupported(getInstanceLayers(), layer);
+			return this->isInstanceLayerSupported(this->getInstanceLayers(), layer);
 		}
 
 		/**
@@ -127,6 +128,14 @@ namespace fvkcore {
 		std::shared_ptr<PhysicalDevice> createPhysicalDevice(unsigned int index) const;
 
 	  public:
+		/**
+		 * @brief
+		 *
+		 * @param extensions
+		 * @param extension
+		 * @return true
+		 * @return false
+		 */
 		static bool isInstanceExtensionSupported(const std::vector<VkExtensionProperties> &extensions,
 												 const std::string &extension) {
 			return std::find_if(extensions.begin(), extensions.end(),
@@ -134,13 +143,33 @@ namespace fvkcore {
 									return std::strcmp(device_extension.extensionName, extension.c_str()) == 0;
 								}) != extensions.cend();
 		}
+
+		/**
+		 * @brief
+		 *
+		 * @param layers
+		 * @param layer
+		 * @return true
+		 * @return false
+		 */
 		static bool isInstanceLayerSupported(const std::vector<VkLayerProperties> &layers, const std::string &layer) {
 			return std::find_if(layers.begin(), layers.end(), [layer](const VkLayerProperties &device_layers) {
 					   return std::strcmp(device_layers.layerName, layer.c_str()) == 0;
 				   }) != layers.cend();
 		}
 
+		/**
+		 * @brief Get the Supported Extensions object
+		 *
+		 * @return std::vector<VkExtensionProperties>
+		 */
 		static std::vector<VkExtensionProperties> getSupportedExtensions();
+
+		/**
+		 * @brief Get the Supported Layers object
+		 *
+		 * @return std::vector<VkLayerProperties>
+		 */
 		static std::vector<VkLayerProperties> getSupportedLayers();
 
 		static uint32_t getVersion() {
@@ -166,4 +195,3 @@ namespace fvkcore {
 	};
 
 } // namespace fvkcore
-#endif

@@ -1,5 +1,6 @@
-#include <VKDevice.h>
+#include "VKDevice.h"
 using namespace fvkcore;
+
 int main(int argc, const char **argv) {
 
 	std::unordered_map<const char *, bool> required_device_extensions = {};
@@ -14,9 +15,13 @@ int main(int argc, const char **argv) {
 	std::vector<std::shared_ptr<PhysicalDevice>> physical_devices = core->createPhysicalDevices();
 
 	// TODO print all selected devices!
-	for (int i = 0; i < physical_devices.size(); i++)
+	for (int i = 0; i < physical_devices.size(); i++) {
 		std::cout << physical_devices[i]->getDeviceName() << std::endl;
-	std::shared_ptr<VKDevice> device = std::make_shared<VKDevice>(physical_devices);
+	}
+
+	for (int i = 0; i < physical_devices.size(); i++) {
+		std::shared_ptr<VKDevice> device = std::make_shared<VKDevice>(physical_devices[i], required_device_extensions);
+	}
 
 	return EXIT_SUCCESS;
 }

@@ -17,10 +17,10 @@ using namespace fvkcore;
 VulkanCore::VulkanCore() : inst(nullptr) {
 
 	/*  Check for supported extensions.*/
-	this->instanceExtensions = getSupportedExtensions();
+	this->instanceExtensions = this->getSupportedExtensions();
 
 	/*  Check for supported validation layers.  */
-	this->instanceLayers = getSupportedLayers();
+	this->instanceLayers = this->getSupportedLayers();
 }
 
 VulkanCore::VulkanCore(const std::unordered_map<const char *, bool> &requested_instance_extensions,
@@ -34,6 +34,7 @@ VulkanCore::VulkanCore(VkInstance instance) : VulkanCore() { this->inst = instan
 void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &requested_instance_extensions,
 							const std::unordered_map<const char *, bool> &requested_instance_layers, void *pNext) {
 
+	// TODO remove
 	std::vector<const char *> usedInstanceExtensionNames = {
 		/*	*/
 		//		VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
@@ -60,8 +61,9 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 		if (n.second) {
 			if (isInstanceLayerSupported(n.first)) {
 				useValidationLayers.push_back(n.first);
-			} else
+			} else {
 				throw cxxexcept::RuntimeException("Vulkan Instance does not support Layer: {}", n.first);
+			}
 		}
 	}
 
@@ -150,6 +152,7 @@ std::vector<VkExtensionProperties> VulkanCore::getSupportedExtensions() {
 	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, VK_NULL_HANDLE));
 	instanceExtensions.resize(extensionCount);
 	VKS_VALIDATE(vkEnumerateInstanceExtensionProperties(VK_NULL_HANDLE, &extensionCount, instanceExtensions.data()));
+	
 	return instanceExtensions;
 }
 std::vector<VkLayerProperties> VulkanCore::getSupportedLayers() {

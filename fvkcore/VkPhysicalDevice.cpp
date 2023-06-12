@@ -4,7 +4,9 @@
 
 using namespace fvkcore;
 
-PhysicalDevice::PhysicalDevice(VulkanCore &core, VkPhysicalDevice device) : vkCore(core) { initPhysicalDevice(device); }
+PhysicalDevice::PhysicalDevice(VulkanCore &core, VkPhysicalDevice device) : vkCore(core) {
+	this->initPhysicalDevice(device);
+}
 
 // PhysicalDevice::PhysicalDevice(VkInstance instance, VkPhysicalDevice device)
 // 	: vkCore(std::make_shared<VulkanCore>(instance)) {
@@ -13,25 +15,32 @@ PhysicalDevice::PhysicalDevice(VulkanCore &core, VkPhysicalDevice device) : vkCo
 
 void PhysicalDevice::initPhysicalDevice(VkPhysicalDevice device) {
 
-	/*  Get feature of the device.  */
-	vkGetPhysicalDeviceFeatures(device, &this->features);
+	{
+		/*  Get feature of the device.  */
+		vkGetPhysicalDeviceFeatures(device, &this->features);
 
-	/*  Get memory properties.   */
-	vkGetPhysicalDeviceMemoryProperties(device, &this->memProperties);
+		/*  Get memory properties.   */
+		vkGetPhysicalDeviceMemoryProperties(device, &this->memProperties);
 
-	/*	Get device properties.	*/
-	vkGetPhysicalDeviceProperties(device, &this->properties);
+		/*	Get device properties.	*/
+		vkGetPhysicalDeviceProperties(device, &this->properties);
+	}
+	/*	*/
+	{
+		/*  Select queue family.    */
+		uint32_t nrQueueFamilies;
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &nrQueueFamilies, VK_NULL_HANDLE);
+		this->queueFamilyProperties.resize(nrQueueFamilies);
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &nrQueueFamilies, this->queueFamilyProperties.data());
+	}
 
-	/*  Select queue family.    */
-	uint32_t nrQueueFamilies;
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &nrQueueFamilies, VK_NULL_HANDLE);
-	this->queueFamilyProperties.resize(nrQueueFamilies);
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &nrQueueFamilies, this->queueFamilyProperties.data());
-
-	uint32_t nrExtensions;
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, nullptr);
-	this->extensions.resize(nrExtensions);
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, this->extensions.data());
+	/*	*/
+	{
+		uint32_t nrExtensions;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, nullptr);
+		this->extensions.resize(nrExtensions);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &nrExtensions, this->extensions.data());
+	}
 
 	this->mdevice = device;
 }

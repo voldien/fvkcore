@@ -19,8 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef _FVK_VK_DEVICE_H_
-#define _FVK_VK_DEVICE_H_ 1
+#pragma once
 #include "VKHelper.h"
 #include "VKUtil.h"
 #include "VkPhysicalDevice.h"
@@ -28,6 +27,7 @@
 #include <fmt/core.h>
 #include <optional>
 #include <unordered_map>
+
 namespace fvkcore {
 
 	/**
@@ -63,15 +63,38 @@ namespace fvkcore {
 		 * @return false
 		 */
 		bool isGroupDevice() const noexcept { return this->getPhysicalDevices().size() > 0; }
+
+		/**
+		 * @brief Get the Physical Devices object
+		 *
+		 * @return const std::vector<std::shared_ptr<PhysicalDevice>>&
+		 */
 		const std::vector<std::shared_ptr<PhysicalDevice>> &getPhysicalDevices() const noexcept {
 			return this->physicalDevices;
 		}
 
-		unsigned int getNrPhysicalDevices() const noexcept { return this->physicalDevices.size(); }
+		/**
+		 * @brief Get the Nr Physical Devices object
+		 *
+		 * @return unsigned int
+		 */
+		size_t getNrPhysicalDevices() const noexcept { return this->physicalDevices.size(); }
+
+		/**
+		 * @brief Get the Physical Device object
+		 *
+		 * @param index
+		 * @return const std::shared_ptr<PhysicalDevice>&
+		 */
 		const std::shared_ptr<PhysicalDevice> &getPhysicalDevice(unsigned int index) const {
 			return this->physicalDevices[index];
 		}
 
+		/**
+		 * @brief Get the Handle object
+		 *
+		 * @return VkDevice
+		 */
 		VkDevice getHandle() const noexcept { return this->logicalDevice; }
 
 		VkQueue getDefaultGraphicQueue() const noexcept { return this->graphicsQueue; }
@@ -164,7 +187,7 @@ namespace fvkcore {
 		beginSingleTimeCommands(VkCommandPool commandPool, VkCommandBufferLevel level, unsigned int nrCmdBuffers = 1,
 								VkCommandBufferUsageFlags usage = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
 								VkCommandBufferInheritanceInfo *pInheritInfo = nullptr, const void *pNext = nullptr) {
-			std::vector<VkCommandBuffer> cmd = allocateCommandBuffers(commandPool, level, nrCmdBuffers);
+			std::vector<VkCommandBuffer> cmd = this->allocateCommandBuffers(commandPool, level, nrCmdBuffers);
 
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -182,10 +205,10 @@ namespace fvkcore {
 			VKS_VALIDATE(vkEndCommandBuffer(commandBuffer));
 
 			const std::vector<VkCommandBuffer> cmds = {commandBuffer};
-			submitCommands(queue, cmds);
+			this->submitCommands(queue, cmds);
 			VKS_VALIDATE(vkQueueWaitIdle(queue));
 
-			vkFreeCommandBuffers(getHandle(), commandPool, cmds.size(), cmds.data());
+			vkFreeCommandBuffers(this->getHandle(), commandPool, cmds.size(), cmds.data());
 		}
 
 		/**
@@ -197,6 +220,7 @@ namespace fvkcore {
 		 */
 		bool isFormatSupported(VkFormat format, VkImageType imageType, VkImageTiling tiling,
 							   VkImageUsageFlags usage) const noexcept {
+			/*	Check either as the group or the physical device.	*/
 			return this->physicalDevices[0]->isFormatSupported(format, imageType, tiling, usage);
 		}
 
@@ -217,5 +241,3 @@ namespace fvkcore {
 		VkQueue sparseQueue;
 	};
 } // namespace fvkcore
-
-#endif
