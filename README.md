@@ -2,7 +2,6 @@
 [![Linux Build](https://github.com/voldien/fvkcore/actions/workflows/linux-build.yml/badge.svg)](https://github.com/voldien/fvkcore/actions/workflows/linux-build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/release/voldien/fvkcore.svg)](https://github.com/voldien/fvkcore/releases)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/voldien/fvkcore.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/voldien/fvkcore/context:cpp)
 
 **FVKCore** is a simple library for handling much of the core functionalities associated with a Vulkan-based program. Like Creation of Vulkan Instance, Physical Device, Device Object and etc. Furthermore, with a set of helper methods commonly used for improving the development process.
 

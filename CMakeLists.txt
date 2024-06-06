@@ -127,8 +127,8 @@ ADD_LIBRARY(fvkcore ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
 TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
 
-TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept cxx_override
-	cxx_sizeof_member cxx_static_assert cxx_decltype cxx_defaulted_functions
+TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept
+	cxx_sizeof_member cxx_static_assert cxx_defaulted_functions
 	cxx_default_function_template_args cxx_std_17)
 
 TARGET_INCLUDE_DIRECTORIES(fvkcore PUBLIC ${Vulkan_INCLUDE_DIRS}
@@ -142,7 +142,10 @@ IF (BUILD_SHARED_LIBS AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 	SET_PROPERTY(TARGET fvkcore PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF()
 
-INSTALL(TARGETS fvkcore DESTINATION lib)
+INSTALL(TARGETS fvkcore DESTINATION lib
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT lib
+    PUBLIC_HEADER EXCLUDE_FROM_ALL)
 
 #####################
 # Examples

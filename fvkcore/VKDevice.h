@@ -47,32 +47,34 @@ namespace fvkcore {
 		 */
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT, const void* pNext = nullptr);
+				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+				 const void *pNext = nullptr);
 
 		/**
 		 * @brief Construct a new VKDevice object
-		 * 
-		 * @param physicalDevice 
-		 * @param requested_extensions 
-		 * @param requiredQueues 
+		 *
+		 * @param physicalDevice
+		 * @param requested_extensions
+		 * @param requiredQueues
 		 */
 		VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT, const void* pNext = nullptr);
+				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+				 const void *pNext = nullptr);
 
 		/**
 		 * @brief Construct a new VKDevice object
-		 * 
-		 * @param physicalDevices 
-		 * @param requested_extensions 
-		 * @param queues 
+		 *
+		 * @param physicalDevices
+		 * @param requested_extensions
+		 * @param queues
 		 */
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions,
-				 const std::vector<VkDeviceQueueCreateInfo> &queues, const void* pNext = nullptr);
+				 const std::vector<VkDeviceQueueCreateInfo> &queues, const void *pNext = nullptr);
 
-		VKDevice(const VKDevice &) = delete;
-		VKDevice(VKDevice &&) = delete;
+		VKDevice(const VKDevice &other) = delete;
+		VKDevice(VKDevice &&other) = delete;
 		~VKDevice();
 
 		/**

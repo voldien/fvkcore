@@ -210,7 +210,7 @@ namespace fvkcore {
 
 		uint32_t queue_count;
 		std::vector<VkPhysicalDevice> physicalDevices;
-		
+
 	}; // namespace fvkcore
 
 } // namespace fvkcore

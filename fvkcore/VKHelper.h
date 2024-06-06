@@ -49,7 +49,7 @@ namespace fvkcore {
 		 * @return uint32_t
 		 */
 		static std::optional<uint32_t> findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
-													  VkMemoryPropertyFlags properties);
+													  VkMemoryPropertyFlags properties) noexcept;
 
 		/**
 		 * @brief
@@ -60,7 +60,7 @@ namespace fvkcore {
 		 * @return uint32_t
 		 */
 		static std::optional<uint32_t> findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
-													  uint32_t typeFilter, VkMemoryPropertyFlags properties);
+													  uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept;
 
 		/**
 		 * @brief
@@ -72,7 +72,7 @@ namespace fvkcore {
 		 * @param newLayout
 		 */
 		static void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout,
-										  VkImageLayout newLayout) {
+										  VkImageLayout newLayout) noexcept {
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -112,7 +112,7 @@ namespace fvkcore {
 		}
 
 		static void memoryBarrier(VkCommandBuffer cmd, VkAccessFlags a, VkAccessFlags b, VkPipelineStageFlags src,
-								  VkPipelineStageFlags dest, const char *pNext = nullptr) {
+								  VkPipelineStageFlags dest, const char *pNext = nullptr) noexcept {
 			VkMemoryBarrier memoryBarrier = {};
 			memoryBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
 			memoryBarrier.pNext = pNext;
@@ -124,7 +124,7 @@ namespace fvkcore {
 
 		static void bufferBarrier(VkCommandBuffer cmd, VkAccessFlags buffer_src_access, VkAccessFlags buffer_dst_access,
 								  VkBuffer buffer, size_t size, size_t offset, VkPipelineStageFlags src,
-								  VkPipelineStageFlags dest, const char *pNext = nullptr) {
+								  VkPipelineStageFlags dest, const char *pNext = nullptr) noexcept {
 			VkBufferMemoryBarrier bufferBarrier = {};
 			bufferBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 			bufferBarrier.pNext = pNext;
@@ -142,7 +142,7 @@ namespace fvkcore {
 		static void imageBarrier(VkCommandBuffer cmd, VkAccessFlags image_src_access, VkAccessFlags image_dst_access,
 								 VkImage image, VkImageLayout old_layout, VkImageLayout new_layout,
 								 const VkImageSubresourceRange &range, VkPipelineStageFlags src,
-								 VkPipelineStageFlags dest, const char *pNext = nullptr) {
+								 VkPipelineStageFlags dest, const char *pNext = nullptr) noexcept {
 
 			VkImageMemoryBarrier imageMemoryBarrier = {};
 			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -169,10 +169,11 @@ namespace fvkcore {
 			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			allocInfo.allocationSize = size;
 			const auto typeIndex = findMemoryType(memoryProperies, memRequirements.memoryTypeBits, properties);
-			if (typeIndex)
+			if (typeIndex) {
 				allocInfo.memoryTypeIndex = typeIndex.value();
-			else
+			} else {
 				throw cxxexcept::RuntimeException("");
+			}
 
 			/**/
 			VKS_VALIDATE(vkAllocateMemory(device, &allocInfo, pAllocator, &deviceMemory));
@@ -278,11 +279,18 @@ namespace fvkcore {
 		static VkShaderModule createShaderModule(VkDevice device, const std::vector<T> &data,
 												 const VkAllocationCallbacks *pAllocator = nullptr,
 												 const char *pNext = nullptr) {
+			return createShaderModule(device, data.data(), data.size(), pAllocator, pNext);
+		}
+
+		template <typename T>
+		static VkShaderModule createShaderModule(VkDevice device, const T &data, size_t size,
+												 const VkAllocationCallbacks *pAllocator = nullptr,
+												 const char *pNext = nullptr) {
 			VkShaderModuleCreateInfo createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 			createInfo.pNext = pNext;
 			createInfo.flags = 0;
-			createInfo.codeSize = data.size() * sizeof(T);
+			createInfo.codeSize = size * sizeof(T);
 			createInfo.pCode = reinterpret_cast<const uint32_t *>(data.data());
 
 			/*	Spirv is aligned with words of 4 bytes.	*/
@@ -322,7 +330,7 @@ namespace fvkcore {
 		static void
 		createDescriptorSetLayout(VkDevice device, VkDescriptorSetLayout &descriptorSetLayout,
 								  const std::array<VkDescriptorSetLayoutBinding, n> &descitprSetLayoutBindings,
-								  const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) {
+								  const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) noexcept {
 
 			std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindingsV(descitprSetLayoutBindings.begin(),
 																				   descitprSetLayoutBindings.end());
@@ -529,8 +537,8 @@ namespace fvkcore {
 
 		// 							   }
 		// static void stageBufferToImageCmdCopyDirect(VkDevice device, VkQueue queue, VkCommandBuffer cmd, VkBuffer
-		// src, 											VkImage dst, const VkExtent3D &size, 											const VkOffset3D &offset
-		// = {0, 0, 0})
+		// src, 											VkImage dst, const VkExtent3D &size,
+		// const VkOffset3D &offset = {0, 0, 0})
 		// {
 
 		// 	// VkCommandBuffer commandBuffer = beginSingleTimeCommands();

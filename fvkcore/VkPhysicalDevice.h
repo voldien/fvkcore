@@ -258,10 +258,10 @@ namespace fvkcore {
 		 */
 		VulkanCore &getInstance() const noexcept { return this->vkCore; }
 
-	  protected:
+	  protected: /*	*/
 		void initPhysicalDevice(VkPhysicalDevice device);
 
-	  private:
+	  private: /*	*/
 		VkPhysicalDevice mdevice;
 		VkPhysicalDeviceFeatures features;
 		VkPhysicalDeviceMemoryProperties memProperties;
@@ -269,6 +269,7 @@ namespace fvkcore {
 		std::vector<VkQueueFamilyProperties> queueFamilyProperties;
 		std::vector<VkExtensionProperties> extensions;
 
+		/*	*/
 		VulkanCore &vkCore;
 	};
 } // namespace fvkcore

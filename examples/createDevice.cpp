@@ -1,7 +1,7 @@
 #include "Exception.hpp"
 #include "VKDevice.h"
-#include "vulkan/vulkan_core.h"
 #include <cstddef>
+#include <cxxopts.hpp>
 using namespace fvkcore;
 
 VkBool32 debugCallBack(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object,
@@ -11,6 +11,19 @@ VkBool32 debugCallBack(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT o
 }
 
 int main(int argc, const char **argv) {
+
+	/*	Default common options between all samples.	*/
+	cxxopts::Options options("Example");
+	options.add_options("Example")("h,help", "helper information.")("d,debug", "Debug",
+																	cxxopts::value<bool>()->default_value("false"))(
+		"g,gpu", "Select GPU", cxxopts::value<std::string>()->default_value("-1"));
+
+	/*	Parse the command line input.	*/
+	const auto result = options.parse(argc, (char **&)argv);
+
+	/*	*/
+	const bool debug = result["debug"].as<bool>();
+	const std::string gpus = result["gpu"].as<std::string>();
 
 	try {
 		std::unordered_map<const char *, bool> required_device_extensions = {};
@@ -32,12 +45,15 @@ int main(int argc, const char **argv) {
 		/*	All physical devices.	*/
 		std::vector<std::shared_ptr<PhysicalDevice>> physical_devices = core->createPhysicalDevices();
 
-		for (int i = 0; i < physical_devices.size(); i++) {
+		for (size_t i = 0; i < physical_devices.size(); i++) {
 			std::cout << physical_devices[i]->getDeviceName() << std::endl;
+			for(size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++){
+				physical_devices[i]->getQueueFamilyProperties()[j].queueCount;
+			}
 		}
 		std::flush(std::cout);
 
-		for (int i = 0; i < physical_devices.size(); i++) {
+		for (size_t i = 0; i < physical_devices.size(); i++) {
 
 			std::vector<VkDeviceQueueCreateInfo> queues;
 
@@ -56,13 +72,14 @@ int main(int argc, const char **argv) {
 
 				queues.push_back(queueCreateInfo);
 			}
+			
 			std::vector<std::shared_ptr<PhysicalDevice>> devices = {physical_devices[i]};
 			std::shared_ptr<VKDevice> device = std::make_shared<VKDevice>(devices, required_device_extensions, queues);
 
 			VkQueue queue = device->getQueue(0, 0);
-
-			
 		}
+
+
 	} catch (std::exception &ex) {
 		cxxexcept::printStackMessage(ex);
 	}

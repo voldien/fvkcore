@@ -6,14 +6,14 @@
 using namespace fvkcore;
 
 std::optional<uint32_t> VKHelper::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
-												 VkMemoryPropertyFlags properties) {
+												 VkMemoryPropertyFlags properties) noexcept {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 	return findMemoryType(memProperties, typeFilter, properties);
 }
 
 std::optional<uint32_t> VKHelper::findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
-												 uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+												 uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept {
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
 			return {i};
