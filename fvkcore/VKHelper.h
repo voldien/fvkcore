@@ -279,7 +279,7 @@ namespace fvkcore {
 		static VkShaderModule createShaderModule(VkDevice device, const std::vector<T> &data,
 												 const VkAllocationCallbacks *pAllocator = nullptr,
 												 const char *pNext = nullptr) {
-			return createShaderModule(device, data.data(), data.size(), pAllocator, pNext);
+			return createShaderModule(device, *data.data(), data.size(), pAllocator, pNext);
 		}
 
 		template <typename T>
@@ -291,7 +291,7 @@ namespace fvkcore {
 			createInfo.pNext = pNext;
 			createInfo.flags = 0;
 			createInfo.codeSize = size * sizeof(T);
-			createInfo.pCode = reinterpret_cast<const uint32_t *>(data.data());
+			createInfo.pCode = reinterpret_cast<const uint32_t *>(&data);
 
 			/*	Spirv is aligned with words of 4 bytes.	*/
 			assert(createInfo.codeSize % 4 == 0);
