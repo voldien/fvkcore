@@ -118,15 +118,6 @@ namespace fvkcore {
 		 */
 		VkDevice getHandle() const noexcept { return this->logicalDevice; }
 
-		VkQueue getDefaultGraphicQueue() const noexcept { return this->graphicsQueue; }
-		VkQueue getDefaultPresent() const noexcept { return this->presentQueue; }
-		VkQueue getDefaultCompute() const noexcept { return this->computeQueue; }
-		VkQueue getDefaultTransfer() const noexcept { return this->transferQueue; }
-
-		uint32_t getDefaultGraphicQueueIndex() const noexcept { return this->graphics_queue_node_index; }
-		uint32_t getDefaultComputeQueueIndex() const noexcept { return this->compute_queue_node_index; }
-		uint32_t getDefaultTransferQueueIndex() const noexcept { return this->transfer_queue_node_index; }
-
 		/**
 		 * @brief
 		 *
@@ -253,20 +244,23 @@ namespace fvkcore {
 			return queue;
 		}
 
+		struct VKQueue {
+		  public:
+			VkQueue queue;
+			int familyIndex;
+			int queueIndex;
+		};
+
 	  private:
-		uint32_t graphics_queue_node_index;
-		uint32_t compute_queue_node_index;
-		uint32_t transfer_queue_node_index;
-		uint32_t present_queue_node_index;
-		uint32_t sparse_queue_node_index;
+		void createDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
+						  const std::unordered_map<const char *, bool> &requested_extensions,
+						  const std::vector<VkDeviceQueueCreateInfo> &queues, const void *pNext = nullptr);
+
+	  private:
+		std::vector<VKQueue> queues;
 
 		std::vector<std::shared_ptr<PhysicalDevice>> physicalDevices;
 		VkDevice logicalDevice = VK_NULL_HANDLE;
 
-		VkQueue graphicsQueue = VK_NULL_HANDLE;
-		VkQueue presentQueue = VK_NULL_HANDLE;
-		VkQueue computeQueue = VK_NULL_HANDLE;
-		VkQueue transferQueue = VK_NULL_HANDLE;
-		VkQueue sparseQueue = VK_NULL_HANDLE;
 	};
 } // namespace fvkcore

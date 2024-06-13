@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 3.6 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.1...3.19 )
 PROJECT(frag-vulkan-core)
 
 OPTION(BUILD_SHARED_LIBS "Build package with shared libraries." ON)
@@ -8,6 +8,11 @@ IF(NOT BUILD_SHARED_LIBS)
 ELSE()
 	MESSAGE(STATUS "Shared libraries enabled")
 ENDIF(NOT BUILD_SHARED_LIBS)
+
+# 
+IF(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    SET(FVKCORE_STANDALONE_PROJECT ON)
+ENDIF()
 
 ############################################
 # Adding directory of cmake modules.
@@ -150,4 +155,6 @@ INSTALL(TARGETS fvkcore DESTINATION lib
 #####################
 # Examples
 #####################
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/examples)
+IF(FVKCORE_STANDALONE_PROJECT)
+    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/examples)
+ENDIF()

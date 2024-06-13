@@ -22,6 +22,7 @@
 #ifndef _FVK_VK_DEBUG_H_
 #define _FVK_VK_DEBUG_H_ 1
 #include "VKUtil.h"
+
 namespace fvkcore {
 
 	class FVK_DECL_EXTERN VKDebug {

@@ -60,7 +60,7 @@ int main(int argc, const char **argv) {
 			for (size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++) {
 				/*  */
 				const VkQueueFamilyProperties &familyProp = physical_devices[i]->getQueueFamilyProperties()[j];
-				std::vector<float> queuePriorities(1.0f, physical_devices[i]->getQueueFamilyProperties().size());
+				std::vector<float> queuePriorities(physical_devices[i]->getQueueFamilyProperties().size(), 1.0f);
 
 				VkDeviceQueueCreateInfo queueCreateInfo;
 				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -72,13 +72,14 @@ int main(int argc, const char **argv) {
 
 				queues.push_back(queueCreateInfo);
 			}
-			
+
+			/*	*/
 			std::vector<std::shared_ptr<PhysicalDevice>> devices = {physical_devices[i]};
 			std::shared_ptr<VKDevice> device = std::make_shared<VKDevice>(devices, required_device_extensions, queues);
 
+			/*	*/
 			VkQueue queue = device->getQueue(0, 0);
 		}
-
 
 	} catch (std::exception &ex) {
 		cxxexcept::printStackMessage(ex);

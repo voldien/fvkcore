@@ -131,11 +131,11 @@ namespace fvkcore {
 				PimageFormatProperties = &prop;
 			VkResult result = vkGetPhysicalDeviceImageFormatProperties(this->getHandle(), format, imageType, tiling,
 																	   usage, 0, PimageFormatProperties);
-			if (result == VK_SUCCESS)
+			if (result == VK_SUCCESS) {
 				return true;
-			else if (result == VK_ERROR_FORMAT_NOT_SUPPORTED)
+			} else if (result == VK_ERROR_FORMAT_NOT_SUPPORTED) {
 				return false;
-			else {
+			} else {
 				VKS_VALIDATE(result);
 				return false;
 			}

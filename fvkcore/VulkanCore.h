@@ -48,8 +48,6 @@ namespace fvkcore {
 					   {{"VK_LAYER_KHRONOS_validation", true}},
 				   void *pNext = nullptr);
 
-		// VulkanCore(VkInstanceCreateInfo& c);
-
 		template <typename T>
 		VulkanCore(const std::vector<std::string> &requested_instance_extensions,
 				   const std::vector<std::string> &requested_layers, const std::string &Name, uint32_t version,
@@ -95,7 +93,12 @@ namespace fvkcore {
 		 * @return const std::vector<VkPhysicalDevice>&
 		 */
 		const std::vector<VkPhysicalDevice> &getPhysicalDevices() const noexcept { return this->physicalDevices; }
-
+		
+		/**
+		 * @brief Get the Nr Physical Devices object
+		 * 
+		 * @return uint32_t 
+		 */
 		uint32_t getNrPhysicalDevices() const noexcept { return getPhysicalDevices().size(); }
 
 		/**
@@ -201,14 +204,7 @@ namespace fvkcore {
 		std::vector<VkExtensionProperties> instanceExtensions;
 		std::vector<VkLayerProperties> instanceLayers;
 
-		VkDebugUtilsMessengerEXT debugMessenger;
-		VkDebugReportCallbackEXT debugReport;
-
-		int nrGroupDevices;
-
-		bool enableDebugTracer;
-
-		uint32_t queue_count;
+		/*	*/
 		std::vector<VkPhysicalDevice> physicalDevices;
 
 	}; // namespace fvkcore
