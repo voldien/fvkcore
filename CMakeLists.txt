@@ -60,7 +60,6 @@ ENDIF()
 ######################################
 # Finding and Target Dependencies
 #####################################3
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
 IF(NOT TARGET cxxexcept)
     ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/execptcxx EXCLUDE_FROM_ALL)
 ENDIF()
@@ -68,6 +67,8 @@ ENDIF()
 FIND_PACKAGE(Vulkan QUIET)
 IF(Vulkan_FOUND)
     MESSAGE(STATUS "Vulkan: ${Vulkan_LIBRARY}")
+ELSE()
+    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers EXCLUDE_FROM_ALL)
 ENDIF()
 
 
@@ -130,7 +131,10 @@ FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h )
 ######################################
 ADD_LIBRARY(fvkcore ${VKS_CORE_SOURCE_FILES} ${VKS_CORE_HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept Vulkan-Headers ${Vulkan_LIBRARIES} )
+TARGET_LINK_LIBRARIES(fvkcore PUBLIC fmt cxxexcept ${Vulkan_LIBRARIES} )
+IF(NOT Vulkan_FOUND)
+    TARGET_LINK_LIBRARIES(fvkcore PUBLIC Vulkan-Headers)
+ENDIF()
 
 TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept
 	cxx_sizeof_member cxx_static_assert cxx_defaulted_functions

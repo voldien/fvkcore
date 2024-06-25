@@ -105,13 +105,13 @@ void VulkanCore::Initialize(const std::unordered_map<const char *, bool> &reques
 std::vector<std::shared_ptr<PhysicalDevice>> VulkanCore::createPhysicalDevices() const {
 	std::vector<std::shared_ptr<PhysicalDevice>> _physicalDevices(this->getPhysicalDevices().size());
 	for (uint32_t i = 0; i < this->getPhysicalDevices().size(); i++) {
-		_physicalDevices[i] = createPhysicalDevice(i);
+		_physicalDevices[i] = this->createPhysicalDevice(i);
 	}
 	return _physicalDevices;
 }
 
 std::shared_ptr<PhysicalDevice> VulkanCore::createPhysicalDevice(unsigned int index) const {
-	return std::make_shared<PhysicalDevice>((VulkanCore &)*this, getPhysicalDevices()[index]);
+	return std::make_shared<PhysicalDevice>((VulkanCore &)*this, this->getPhysicalDevices()[index]);
 }
 
 VulkanCore::~VulkanCore() {

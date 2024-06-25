@@ -54,7 +54,7 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physical_
 		queueCreateInfo.pQueuePriorities = &queuePriorities[i];
 	}
 
-	createDevice(physical_devices, requested_extensions, queueCreations, pNext);
+	this->createDevice(physical_devices, requested_extensions, queueCreations, pNext);
 }
 
 VKDevice::VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
