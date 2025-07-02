@@ -236,6 +236,7 @@ VkSurfaceFormatKHR VKHelper::selectSurfaceFormat(const std::vector<VkSurfaceForm
 												 const std::vector<VkSurfaceFormatKHR> &requestFormats,
 												 VkColorSpaceKHR request_color_space) {
 
+	/*	*/
 	for (uint32_t request_i = 0; request_i < requestFormats.size(); request_i++) {
 		for (uint32_t avail_i = 0; avail_i < availableFormats.size(); avail_i++) {
 			if (availableFormats[avail_i].format == requestFormats[request_i].format &&
@@ -263,6 +264,7 @@ VkPresentModeKHR VKHelper::chooseSwapPresentMode(const std::vector<VkPresentMode
 }
 
 VkExtent2D VKHelper::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities, VkExtent2D actualExtent) {
+	/*	*/
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		return capabilities.currentExtent;
 	} else {

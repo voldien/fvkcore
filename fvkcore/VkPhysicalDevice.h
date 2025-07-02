@@ -23,7 +23,6 @@
 #include "VKHelper.h"
 #include "VulkanCore.h"
 #include "vulkan/vulkan_core.h"
-#include <stdexcept>
 
 namespace fvkcore {
 

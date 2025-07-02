@@ -1,5 +1,6 @@
 #include "Exception.hpp"
 #include "VKDevice.h"
+#include "vulkan/vulkan_core.h"
 #include <cstddef>
 #include <cxxopts.hpp>
 using namespace fvkcore;
@@ -47,20 +48,34 @@ int main(int argc, const char **argv) {
 
 		for (size_t i = 0; i < physical_devices.size(); i++) {
 			std::cout << physical_devices[i]->getDeviceName() << std::endl;
-			for(size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++){
+
+			const bool supported_graphic_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_GRAPHICS_BIT);
+			const bool supported_compute_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_COMPUTE_BIT);
+			const bool supported_transfer_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_TRANSFER_BIT);
+			const bool supported_protected_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_SPARSE_BINDING_BIT);
+
+			std::cout << "\tSupport Graphic Queue: " << supported_graphic_queue << std::endl;
+			std::cout << "\tSupport Compute Queue: " << supported_compute_queue << std::endl;
+			std::cout << "\tSupport Trasnfer Queue: " << supported_transfer_queue << std::endl;
+			std::cout << "\tSupport Protected Queue: " << supported_protected_queue << std::endl;
+
+			for (size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++) {
 				physical_devices[i]->getQueueFamilyProperties()[j].queueCount;
 			}
 		}
 		std::flush(std::cout);
 
+		/*	*/
+
 		for (size_t i = 0; i < physical_devices.size(); i++) {
 
 			std::vector<VkDeviceQueueCreateInfo> queues;
+			std::vector<float> queuePriorities(32, 1.0f);
 
 			for (size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++) {
+
 				/*  */
 				const VkQueueFamilyProperties &familyProp = physical_devices[i]->getQueueFamilyProperties()[j];
-				std::vector<float> queuePriorities(physical_devices[i]->getQueueFamilyProperties().size(), 1.0f);
 
 				VkDeviceQueueCreateInfo queueCreateInfo;
 				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -74,8 +89,16 @@ int main(int argc, const char **argv) {
 			}
 
 			/*	*/
-			std::vector<std::shared_ptr<PhysicalDevice>> devices = {physical_devices[i]};
-			std::shared_ptr<VKDevice> device = std::make_shared<VKDevice>(devices, required_device_extensions, queues);
+			std::vector<std::shared_ptr<PhysicalDevice>> use_physical_devices = {physical_devices[i]};
+			std::shared_ptr<VKDevice> device =
+				std::make_shared<VKDevice>(use_physical_devices, required_device_extensions, queues);
+
+			const std::vector<std::shared_ptr<PhysicalDevice>> &device_physical_devices = device->getPhysicalDevices();
+			for (size_t phy_index = 0; phy_index < device_physical_devices.size(); phy_index++) {
+				device_physical_devices[phy_index]->isLocalandStagning();
+			}
+
+			device->getPhysicalDevice(0)->isLocalandStagning();
 
 			/*	*/
 			VkQueue queue = device->getQueue(0, 0);

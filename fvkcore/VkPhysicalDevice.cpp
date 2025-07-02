@@ -1,6 +1,4 @@
 #include "VkPhysicalDevice.h"
-#include "VKHelper.h"
-#include <memory>
 
 using namespace fvkcore;
 

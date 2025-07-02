@@ -1,5 +1,4 @@
 #include "VulkanCore.h"
-#include "VKHelper.h"
 #include "VkPhysicalDevice.h"
 #include <cassert>
 #include <csignal>
@@ -10,7 +9,6 @@
 #include "VKUtil.h"
 #include <fmt/core.h>
 #include <getopt.h>
-#include <stdexcept>
 
 using namespace fvkcore;
 
