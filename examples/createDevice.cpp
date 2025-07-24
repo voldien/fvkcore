@@ -98,10 +98,18 @@ int main(int argc, const char **argv) {
 				device_physical_devices[phy_index]->isLocalandStagning();
 			}
 
-			device->getPhysicalDevice(0)->isLocalandStagning();
+			if (device->getPhysicalDevice(0)->isLocalandStagning()) {
+				std::cout << "\t" << "Single Heap" << "Local Stagning not Needed" << std::endl;
+			}
 
-			/*	*/
-			VkQueue queue = device->getQueue(0, 0);
+			/*	Check All Queues*/
+			for (size_t queue_index = 0; queue_index < device->getQueues().size(); queue_index++) {
+				std::cout << "\t\tQueue Family: " << device->getQueues()[queue_index].familyIndex
+						  << " Index: " << device->getQueues()[queue_index].queueIndex << std::endl;
+
+				VkQueue queue = device->getQueue(device->getQueues()[queue_index].familyIndex,
+												 device->getQueues()[queue_index].queueIndex);
+			}
 		}
 
 	} catch (std::exception &ex) {

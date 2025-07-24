@@ -93,11 +93,11 @@ namespace fvkcore {
 		 * @return const std::vector<VkPhysicalDevice>&
 		 */
 		const std::vector<VkPhysicalDevice> &getPhysicalDevices() const noexcept { return this->physicalDevices; }
-		
+
 		/**
 		 * @brief Get the Nr Physical Devices object
-		 * 
-		 * @return uint32_t 
+		 *
+		 * @return uint32_t
 		 */
 		uint32_t getNrPhysicalDevices() const noexcept { return getPhysicalDevices().size(); }
 
@@ -197,6 +197,8 @@ namespace fvkcore {
 			return version;
 		}
 
+		const VkAllocationCallbacks *getAllocatorCallback() const noexcept { return this->Allocator; }
+
 	  protected:
 		VkInstance inst = VK_NULL_HANDLE;
 
@@ -206,7 +208,7 @@ namespace fvkcore {
 
 		/*	*/
 		std::vector<VkPhysicalDevice> physicalDevices;
-
+		VkAllocationCallbacks *Allocator = nullptr;
 	}; // namespace fvkcore
 
 } // namespace fvkcore

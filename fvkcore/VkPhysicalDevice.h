@@ -104,24 +104,10 @@ namespace fvkcore {
 		}
 
 		/**
-		 * @brief
-		 *
-		 * @param surface
-		 * @param queueFamilyIndex
-		 * @return true
-		 * @return false
 		 */
 		bool isPresentable(VkSurfaceKHR surface, uint32_t queueFamilyIndex) const;
 
 		/**
-		 * @brief
-		 *
-		 * @param format
-		 * @param imageType
-		 * @param tiling
-		 * @param usage
-		 * @return true
-		 * @return false
 		 */
 		bool isFormatSupported(VkFormat format, VkImageType imageType, VkImageTiling tiling, VkImageUsageFlags usage,
 							   VkImageFormatProperties *PimageFormatProperties = nullptr) const {
@@ -171,26 +157,28 @@ namespace fvkcore {
 		// 							VkFormatFeatureFlags features) {}
 
 		bool isLocalandStagning() const noexcept {
+
 			const VkPhysicalDeviceMemoryProperties &prop = getMemoryProperties();
+			if (prop.memoryHeapCount == 1) {
+				return true;
+			}
+
 			for (unsigned int i = 0; i < prop.memoryHeapCount; i++) {
 				const VkMemoryType &memoryType = prop.memoryTypes[i];
 				if (memoryType.propertyFlags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) {
 				}
 			}
+
 			return false;
 		}
 
 		/**
 		 * @brief Get the Handle object
-		 *
-		 * @return VkPhysicalDevice
 		 */
 		VkPhysicalDevice getHandle() const noexcept { return this->mdevice; }
 
 		/**
 		 * @brief Get the Extensions object
-		 *
-		 * @return const std::vector<VkExtensionProperties>&
 		 */
 		const std::vector<VkExtensionProperties> &getExtensions() const noexcept { return this->extensions; }
 

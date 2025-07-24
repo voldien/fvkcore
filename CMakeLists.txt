@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 3.1...3.19 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.1...3.25 )
 PROJECT(frag-vulkan-core)
 
 OPTION(BUILD_SHARED_LIBS "Build package with shared libraries." ON)
@@ -9,7 +9,7 @@ ELSE()
 	MESSAGE(STATUS "Shared libraries enabled")
 ENDIF(NOT BUILD_SHARED_LIBS)
 
-# 
+# Determine if the cmake is standalone project
 IF(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     SET(FVKCORE_STANDALONE_PROJECT ON)
 ENDIF()
@@ -79,17 +79,21 @@ IF((CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX) AND NOT CMAKE_COMPILER_
 
     ADD_DEFINITIONS( -Wall -w -Wfatal-errors)
 
-    IF (CMAKE_BUILD_TYPE STREQUAL "Release")
+    IF(CMAKE_BUILD_TYPE MATCHES Release)
         MESSAGE(STATUS "Compile for release.")
-        ADD_DEFINITIONS( -DNDEBUG )
-        ADD_DEFINITIONS( -O2 )
-        SET(CMAKE_RELEASE TRUE)
-    ELSE()
-        MESSAGE(STATUS "Compile for debug.")
-        ADD_DEFINITIONS( -D_DEBUG )
-        ADD_DEFINITIONS( -g3 -O0 )
-        SET(CMAKE_DEBUG TRUE)
+        ADD_DEFINITIONS(-O3 -march=native)
     ENDIF()
+    IF(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+        MESSAGE(STATUS "Compile for release with Debug.")
+        ADD_DEFINITIONS(-O3 -march=native)
+        ADD_DEFINITIONS(-O3 -g3)
+    ENDIF()
+    IF(CMAKE_BUILD_TYPE MATCHES Debug)
+        MESSAGE(STATUS "Compile for debug.")
+        ADD_DEFINITIONS(-O3 -march=native)
+        ADD_DEFINITIONS(-g3 -O0)
+    ENDIF()
+
 
     #
     IF(BUILD_WITH_COVERAGE)
@@ -121,10 +125,9 @@ ENDIF()
 #####################################
 # Source code files.
 #####################################
-
 SET(Vulkan_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/extern/Vulkan-Headers/include)
 FILE(GLOB VKS_CORE_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.cpp)
-FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h )
+FILE(GLOB VKS_CORE_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fvkcore/*.h ) 
 
 #####################################
 # Main Core Library
@@ -136,6 +139,7 @@ IF(NOT Vulkan_FOUND)
     TARGET_LINK_LIBRARIES(fvkcore PUBLIC Vulkan-Headers)
 ENDIF()
 
+# C++ Features
 TARGET_COMPILE_FEATURES(fvkcore PUBLIC cxx_constexpr cxx_noexcept
 	cxx_sizeof_member cxx_static_assert cxx_defaulted_functions
 	cxx_default_function_template_args cxx_std_17)

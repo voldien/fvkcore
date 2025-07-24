@@ -29,6 +29,7 @@
 #include <fmt/core.h>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
 namespace fvkcore {
 
@@ -38,40 +39,21 @@ namespace fvkcore {
 	 */
 	class FVK_DECL_EXTERN VKDevice {
 	  public:
-		/**
-		 * @brief Construct a new VKDevice object
-		 *
-		 * @param physicalDevices
-		 * @param requested_extensions
-		 * @param requiredQueues
-		 */
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
 				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
 				 const void *pNext = nullptr);
 
-		/**
-		 * @brief Construct a new VKDevice object
-		 *
-		 * @param physicalDevice
-		 * @param requested_extensions
-		 * @param requiredQueues
-		 */
 		VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
 				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
 				 const void *pNext = nullptr);
 
-		/**
-		 * @brief Construct a new VKDevice object
-		 *
-		 * @param physicalDevices
-		 * @param requested_extensions
-		 * @param queues
-		 */
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions,
 				 const std::vector<VkDeviceQueueCreateInfo> &queues, const void *pNext = nullptr);
+
+		VKDevice(VkDevice device);
 
 		VKDevice(const VKDevice &other) = delete;
 		VKDevice(VKDevice &&other) = delete;
@@ -126,8 +108,9 @@ namespace fvkcore {
 		 * @return uint32_t
 		 */
 		template <size_t n = 0>
-		std::optional<uint32_t> findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
-			return VKHelper::findMemoryType(physicalDevices[0]->getMemoryProperties(), typeFilter, properties);
+		std::optional<uint32_t> findMemoryType(const uint32_t typeFilter,
+											   const VkMemoryPropertyFlags memPropertieFlags) const {
+			return VKHelper::findMemoryType(physicalDevices[0]->getMemoryProperties(), typeFilter, memPropertieFlags);
 		}
 
 		/**
@@ -138,7 +121,7 @@ namespace fvkcore {
 		 * @param pNext
 		 * @return VkCommandPool
 		 */
-		VkCommandPool createCommandPool(uint32_t queue,
+		VkCommandPool createCommandPool(const uint32_t queue,
 										VkCommandPoolCreateFlags flag = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 										const void *pNext = nullptr) {
 			VkCommandPool pool;
@@ -196,10 +179,10 @@ namespace fvkcore {
 			return cmdBuffers;
 		}
 
-		std::vector<VkCommandBuffer>
-		beginSingleTimeCommands(VkCommandPool commandPool, VkCommandBufferLevel level, unsigned int nrCmdBuffers = 1,
-								VkCommandBufferUsageFlags usage = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-								VkCommandBufferInheritanceInfo *pInheritInfo = nullptr, const void *pNext = nullptr) {
+		std::vector<VkCommandBuffer> beginSingleTimeCommands(
+			VkCommandPool commandPool, VkCommandBufferLevel level, const unsigned int nrCmdBuffers = 1,
+			const VkCommandBufferUsageFlags usage = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+			const VkCommandBufferInheritanceInfo *pInheritInfo = nullptr, const void *pNext = nullptr) {
 			std::vector<VkCommandBuffer> cmd = this->allocateCommandBuffers(commandPool, level, nrCmdBuffers);
 
 			VkCommandBufferBeginInfo beginInfo{};
@@ -224,24 +207,11 @@ namespace fvkcore {
 			vkFreeCommandBuffers(this->getHandle(), commandPool, cmds.size(), cmds.data());
 		}
 
-		/**
-		 * @brief
-		 *
-		 * @param format
-		 * @return true
-		 * @return false
-		 */
-		bool isFormatSupported(VkFormat format, VkImageType imageType, VkImageTiling tiling,
-							   VkImageUsageFlags usage) const noexcept {
+		bool isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
+							   const VkImageUsageFlags usage) const noexcept {
 
 			/*	Check either as the group or the physical device.	*/
 			return this->getPhysicalDevice(0)->isFormatSupported(format, imageType, tiling, usage);
-		}
-
-		VkQueue getQueue(uint32_t queueFamilyIndex, uint32_t queueIndex) const {
-			VkQueue queue;
-			vkGetDeviceQueue(this->getHandle(), queueFamilyIndex, 0, &queue);
-			return queue;
 		}
 
 		struct VKQueue {
@@ -250,6 +220,13 @@ namespace fvkcore {
 			int familyIndex;
 			int queueIndex;
 		};
+
+		VkQueue getQueue(const uint32_t queueFamilyIndex, const uint32_t queueIndex) const {
+			VkQueue queue;
+			vkGetDeviceQueue(this->getHandle(), queueFamilyIndex, queueIndex, &queue);
+			return queue;
+		}
+		const std::vector<VKQueue> &getQueues() const noexcept { return this->queues; }
 
 	  private:
 		void createDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
@@ -261,6 +238,5 @@ namespace fvkcore {
 
 		std::vector<std::shared_ptr<PhysicalDevice>> physicalDevices;
 		VkDevice logicalDevice = VK_NULL_HANDLE;
-
 	};
 } // namespace fvkcore

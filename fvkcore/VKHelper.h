@@ -40,10 +40,6 @@ namespace fvkcore {
 		/**
 		 * @brief
 		 *
-		 * @param physicalDevice
-		 * @param typeFilter
-		 * @param properties
-		 * @return uint32_t
 		 */
 		static std::optional<uint32_t> findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
 													  VkMemoryPropertyFlags properties) noexcept;
@@ -51,10 +47,6 @@ namespace fvkcore {
 		/**
 		 * @brief
 		 *
-		 * @param memProperties
-		 * @param typeFilter
-		 * @param properties
-		 * @return uint32_t
 		 */
 		static std::optional<uint32_t> findMemoryType(const VkPhysicalDeviceMemoryProperties &memProperties,
 													  uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept;
@@ -199,19 +191,14 @@ namespace fvkcore {
 
 		/**
 		 * @brief Create a Buffer object
-		 *
-		 * @param device
-		 * @param size
-		 * @param memoryProperies
-		 * @param usage
-		 * @param properties
-		 * @param buffer
-		 * @param bufferMemory
 		 */
 		static void createBuffer(VkDevice device, VkDeviceSize size,
 								 const VkPhysicalDeviceMemoryProperties &memoryProperies, VkBufferUsageFlags usage,
 								 VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
+		/**
+		 * @brief
+		 */
 		static void createImage(VkDevice device, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
 								VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
 								const VkPhysicalDeviceMemoryProperties &memProperties, VkImage &image,
@@ -357,7 +344,7 @@ namespace fvkcore {
 			VKS_VALIDATE(vkCreateDescriptorSetLayout(device, &layoutInfo, pAllocator, &descriptorSetLayout));
 		}
 
-		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {},
+		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {}, const VkDescriptorPoolCreateFlags flags = 0,
 											   uint32_t maxSets = 1, const VkAllocationCallbacks *pAllocator = nullptr,
 											   void *pNext = nullptr) {
 			VkDescriptorPool descPool;
@@ -365,6 +352,7 @@ namespace fvkcore {
 			VkDescriptorPoolCreateInfo poolInfo{};
 			poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 			poolInfo.pNext = pNext;
+			poolInfo.flags = flags;
 			poolInfo.poolSizeCount = poolSizes.size();
 			poolInfo.pPoolSizes = poolSizes.data();
 			poolInfo.maxSets = maxSets;
@@ -400,10 +388,11 @@ namespace fvkcore {
 			uint32_t basePipelineIndex = 0, const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) {
 
 			VkPipeline pipeline;
+
 			VkComputePipelineCreateInfo pipelineCreateInfo = {};
+			pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 			pipelineCreateInfo.pNext = pNext;
 			pipelineCreateInfo.flags = 0;
-			pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 			pipelineCreateInfo.stage = compShaderStageInfo;
 			pipelineCreateInfo.layout = layout;
 			pipelineCreateInfo.basePipelineHandle = basePipelineHandle;
