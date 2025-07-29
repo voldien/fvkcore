@@ -228,6 +228,10 @@ namespace fvkcore {
 		}
 		const std::vector<VKQueue> &getQueues() const noexcept { return this->queues; }
 
+		template <typename T> T getProcAddress(const char *name) const noexcept {
+			return (T)vkGetDeviceProcAddr(getHandle(), name);
+		}
+
 	  private:
 		void createDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 						  const std::unordered_map<const char *, bool> &requested_extensions,

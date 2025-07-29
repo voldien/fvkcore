@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 #pragma once
+#include "vulkan/vulkan_core.h"
 #include <VKUtil.h>
 #include <array>
 #include <cassert>
@@ -41,8 +42,8 @@ namespace fvkcore {
 		 * @brief
 		 *
 		 */
-		static std::optional<uint32_t> findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
-													  VkMemoryPropertyFlags properties) noexcept;
+		static std::optional<uint32_t> findMemoryType(VkPhysicalDevice physicalDevice, const uint32_t typeFilter,
+													  const VkMemoryPropertyFlags properties) noexcept;
 
 		/**
 		 * @brief
@@ -61,10 +62,11 @@ namespace fvkcore {
 		 * @param newLayout
 		 */
 		static void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout,
-										  VkImageLayout newLayout) noexcept {
+										  VkImageLayout newLayout, const void *pNext = nullptr) noexcept {
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier.pNext = pNext;
 			barrier.oldLayout = oldLayout;
 			barrier.newLayout = newLayout;
 			barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -100,8 +102,9 @@ namespace fvkcore {
 			vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 		}
 
-		static void memoryBarrier(VkCommandBuffer cmd, VkAccessFlags a, VkAccessFlags b, VkPipelineStageFlags src,
-								  VkPipelineStageFlags dest, const char *pNext = nullptr) noexcept {
+		static void memoryBarrier(VkCommandBuffer cmd, const VkAccessFlags a, const VkAccessFlags b,
+								  const VkPipelineStageFlags src, const VkPipelineStageFlags dest,
+								  const char *pNext = nullptr) noexcept {
 			VkMemoryBarrier memoryBarrier = {};
 			memoryBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
 			memoryBarrier.pNext = pNext;
@@ -302,41 +305,32 @@ namespace fvkcore {
 
 		/**
 		 * @brief Create a Descriptor Set Layout object
-		 *
-		 * @tparam n
-		 * @param device
-		 * @param descriptorSetLayout
-		 * @param descitprSetLayoutBindings
-		 * @param pAllocator
-		 * @param pNext
 		 */
 		template <size_t n>
 		static void
 		createDescriptorSetLayout(VkDevice device, VkDescriptorSetLayout &descriptorSetLayout,
+								  const VkDescriptorSetLayoutCreateFlags flags,
 								  const std::array<VkDescriptorSetLayoutBinding, n> &descitprSetLayoutBindings,
 								  const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) noexcept {
 
 			std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindingsV(descitprSetLayoutBindings.begin(),
 																				   descitprSetLayoutBindings.end());
 
-			createDescriptorSetLayout(device, descriptorSetLayout, descriptorSetLayoutBindingsV, pAllocator, pNext);
+			createDescriptorSetLayout(device, descriptorSetLayout, descriptorSetLayoutBindingsV, flags, pAllocator,
+									  pNext);
 		}
 
 		/**
 		 * @brief Create a Descriptor Set Layout object
-		 *
-		 * @param device
-		 * @param descriptorSetLayout
-		 * @param descitprSetLayoutBindings
-		 * @param pAllocator
-		 * @param pNext
 		 */
 		static void
 		createDescriptorSetLayout(VkDevice device, VkDescriptorSetLayout &descriptorSetLayout,
 								  const std::vector<VkDescriptorSetLayoutBinding> &descitprSetLayoutBindings,
+								  const VkDescriptorSetLayoutCreateFlags flags,
 								  const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) {
 			VkDescriptorSetLayoutCreateInfo layoutInfo{};
 			layoutInfo.pNext = pNext;
+			layoutInfo.flags = flags;
 			layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 			layoutInfo.bindingCount = descitprSetLayoutBindings.size();
 			layoutInfo.pBindings = descitprSetLayoutBindings.data();
@@ -344,8 +338,9 @@ namespace fvkcore {
 			VKS_VALIDATE(vkCreateDescriptorSetLayout(device, &layoutInfo, pAllocator, &descriptorSetLayout));
 		}
 
-		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {}, const VkDescriptorPoolCreateFlags flags = 0,
-											   uint32_t maxSets = 1, const VkAllocationCallbacks *pAllocator = nullptr,
+		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {},
+											   const VkDescriptorPoolCreateFlags flags = 0, uint32_t maxSets = 1,
+											   const VkAllocationCallbacks *pAllocator = nullptr,
 											   void *pNext = nullptr) {
 			VkDescriptorPool descPool;
 
@@ -362,23 +357,10 @@ namespace fvkcore {
 			return descPool;
 		}
 
-		static VkPipelineCache createPipelineCache(VkDevice device, int size, void *pdata,
-												   const VkAllocationCallbacks *pAllocator = nullptr,
-												   void *pNext = nullptr) {
-
-			VkPipelineCache pipelineCache;
-
-			VkPipelineCacheCreateInfo pipelineCacheInfo{};
-			pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			pipelineCacheInfo.pNext = pNext;
-			pipelineCacheInfo.pInitialData = pdata;
-			pipelineCacheInfo.initialDataSize = size;
-			pipelineCacheInfo.flags = 0;
-
-			VKS_VALIDATE(vkCreatePipelineCache(device, &pipelineCacheInfo, pAllocator, &pipelineCache));
-
-			return pipelineCache;
-		}
+		VkPipelineCache createPipelineCache(VkDevice device, const size_t size, void *pdata,
+											const VkPipelineCacheCreateFlags flags = 0,
+											const VkAllocationCallbacks *pAllocator = nullptr,
+											const void *pNext = nullptr);
 
 		static VkPipeline createGraphicPipeline();
 
@@ -518,35 +500,8 @@ namespace fvkcore {
 			vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 		}
 
-		// static void stageBufferCmdCopy(VkDevice device, VkQueue queue, VkCommandBuffer cmd, VkBuffer src, VkBuffer
-		// dst, 							   VkDeviceSize size) {
-
-		// 							   }
-		// static void stageBufferToImageCmdCopyDirect(VkDevice device, VkQueue queue, VkCommandBuffer cmd, VkBuffer
-		// src, 											VkImage dst, const VkExtent3D &size,
-		// const VkOffset3D &offset = {0, 0, 0})
-		// {
-
-		// 	// VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
-		// 	// VkBufferImageCopy region{};
-		// 	// region.bufferOffset = 0;
-		// 	// region.bufferRowLength = 0;
-		// 	// region.bufferImageHeight = 0;
-		// 	// region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		// 	// region.imageSubresource.mipLevel = 0;
-		// 	// region.imageSubresource.baseArrayLayer = 0;
-		// 	// region.imageSubresource.layerCount = 1;
-		// 	// region.imageOffset = {0, 0, 0};
-		// 	// region.imageExtent = {width, height, 1};
-
-		// 	// vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
-		// 	// endSingleTimeCommands(commandBuffer);
-		// }
-
 		static void copyBufferToImageCmd(VkCommandBuffer cmd, VkBuffer src, VkImage dst, const VkExtent3D &size,
-										 const VkOffset3D &offset = {0, 0, 0}) {
+										 const VkOffset3D &offset = {0, 0, 0}, const void *pNext = nullptr) {
 
 			VkBufferImageCopy region{};
 			region.bufferOffset = 0;
@@ -562,7 +517,7 @@ namespace fvkcore {
 			vkCmdCopyBufferToImage(cmd, src, dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 		}
 
-		static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool) {
+		static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool, const void* pNext = nullptr) {
 			VkCommandBufferAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 			allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -582,15 +537,17 @@ namespace fvkcore {
 		}
 
 		static void endSingleTimeCommands(VkDevice device, VkQueue queue, VkCommandBuffer commandBuffer,
-										  VkCommandPool commandPool) {
+										  VkCommandPool commandPool, VkFence fence = VK_NULL_HANDLE, const void* pNext = nullptr) {
 			VKS_VALIDATE(vkEndCommandBuffer(commandBuffer));
 
 			VkSubmitInfo submitInfo{};
 			submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submitInfo.pNext = pNext;
 			submitInfo.commandBufferCount = 1;
 			submitInfo.pCommandBuffers = &commandBuffer;
 
-			VKS_VALIDATE(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+
+			VKS_VALIDATE(vkQueueSubmit(queue, 1, &submitInfo, fence));
 			VKS_VALIDATE(vkQueueWaitIdle(queue));
 
 			/*	*/

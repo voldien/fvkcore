@@ -52,12 +52,18 @@ int main(int argc, const char **argv) {
 			const bool supported_graphic_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_GRAPHICS_BIT);
 			const bool supported_compute_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_COMPUTE_BIT);
 			const bool supported_transfer_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_TRANSFER_BIT);
-			const bool supported_protected_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_SPARSE_BINDING_BIT);
+			const bool supported_sparse_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_SPARSE_BINDING_BIT);
+			const bool supported_protected_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_PROTECTED_BIT);
+			const bool supported_decode_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_VIDEO_DECODE_BIT_KHR);
+			const bool supported_encode_queue = physical_devices[i]->isQueueSupported(VK_QUEUE_VIDEO_ENCODE_BIT_KHR);
 
 			std::cout << "\tSupport Graphic Queue: " << supported_graphic_queue << std::endl;
 			std::cout << "\tSupport Compute Queue: " << supported_compute_queue << std::endl;
-			std::cout << "\tSupport Trasnfer Queue: " << supported_transfer_queue << std::endl;
+			std::cout << "\tSupport Transfer Queue: " << supported_transfer_queue << std::endl;
+			std::cout << "\tSupport Sparse Queue: " << supported_sparse_queue << std::endl;
 			std::cout << "\tSupport Protected Queue: " << supported_protected_queue << std::endl;
+			std::cout << "\tSupport Decode Queue: " << supported_decode_queue << std::endl;
+			std::cout << "\tSupport Encode Queue: " << supported_encode_queue << std::endl;
 
 			for (size_t j = 0; j < physical_devices[i]->getQueueFamilyProperties().size(); j++) {
 				physical_devices[i]->getQueueFamilyProperties()[j].queueCount;
@@ -93,13 +99,17 @@ int main(int argc, const char **argv) {
 			std::shared_ptr<VKDevice> device =
 				std::make_shared<VKDevice>(use_physical_devices, required_device_extensions, queues);
 
+			std::cout << physical_devices[i]->getDeviceName() << std::endl;
+
 			const std::vector<std::shared_ptr<PhysicalDevice>> &device_physical_devices = device->getPhysicalDevices();
 			for (size_t phy_index = 0; phy_index < device_physical_devices.size(); phy_index++) {
-				device_physical_devices[phy_index]->isLocalandStagning();
+				device_physical_devices[phy_index]->isLocalandStaging();
 			}
 
-			if (device->getPhysicalDevice(0)->isLocalandStagning()) {
-				std::cout << "\t" << "Single Heap" << "Local Stagning not Needed" << std::endl;
+			if (device->getPhysicalDevice(0)->isLocalandStaging()) {
+				std::cout << "\t" << "Single Heap" << "Local Staging not Needed" << std::endl;
+			} else {
+				std::cout << "\t" << "Multiple Heap" << "Local Staging Required" << std::endl;
 			}
 
 			/*	Check All Queues*/
@@ -109,6 +119,7 @@ int main(int argc, const char **argv) {
 
 				VkQueue queue = device->getQueue(device->getQueues()[queue_index].familyIndex,
 												 device->getQueues()[queue_index].queueIndex);
+
 			}
 		}
 

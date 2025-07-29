@@ -89,12 +89,8 @@ namespace fvkcore {
 
 		/**
 		 * @brief Check if physical device has support for any the queue types.
-		 *
-		 * @param queueFlag
-		 * @return true
-		 * @return false
 		 */
-		bool isQueueSupported(VkQueueFlags queueFlag) const noexcept {
+		bool isQueueSupported(const VkQueueFlags queueFlag) const noexcept {
 			for (const VkQueueFamilyProperties &a : this->getQueueFamilyProperties()) {
 				if (a.queueFlags & queueFlag) {
 					return true;
@@ -156,7 +152,7 @@ namespace fvkcore {
 		// 							const std::vector<VkFormat> &requestFormats, VkImageTiling tiling,
 		// 							VkFormatFeatureFlags features) {}
 
-		bool isLocalandStagning() const noexcept {
+		bool isLocalandStaging() const noexcept {
 
 			const VkPhysicalDeviceMemoryProperties &prop = getMemoryProperties();
 			if (prop.memoryHeapCount == 1) {

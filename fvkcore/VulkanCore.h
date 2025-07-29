@@ -197,6 +197,10 @@ namespace fvkcore {
 			return version;
 		}
 
+		template <typename T> T getProcAddress(const char *name) const noexcept {
+			return (T)vkGetInstanceProcAddr(getHandle(), name);
+		}
+
 		const VkAllocationCallbacks *getAllocatorCallback() const noexcept { return this->Allocator; }
 
 	  protected:

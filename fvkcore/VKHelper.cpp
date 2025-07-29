@@ -5,8 +5,8 @@
 
 using namespace fvkcore;
 
-std::optional<uint32_t> VKHelper::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter,
-												 VkMemoryPropertyFlags properties) noexcept {
+std::optional<uint32_t> VKHelper::findMemoryType(VkPhysicalDevice physicalDevice, const uint32_t typeFilter,
+												 const VkMemoryPropertyFlags properties) noexcept {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 	return findMemoryType(memProperties, typeFilter, properties);
@@ -26,14 +26,14 @@ void VKHelper::createBuffer(VkDevice device, VkDeviceSize size, const VkPhysical
 							VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,
 							VkDeviceMemory &bufferMemory) {
 
-	/**/
+	/*	*/
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	/**/
+	/*	*/
 	VKS_VALIDATE(vkCreateBuffer(device, &bufferInfo, NULL, &buffer));
 
 	VkMemoryRequirements memRequirements;
@@ -135,6 +135,24 @@ void VKHelper::createPipelineLayout(VkDevice device, VkPipelineLayout &pipelineL
 	pipelineLayoutInfo.pPushConstantRanges = pushConstants.data();
 
 	VKS_VALIDATE(vkCreatePipelineLayout(device, &pipelineLayoutInfo, pAllocator, &pipelineLayout));
+}
+
+VkPipelineCache VKHelper::createPipelineCache(VkDevice device, const size_t size, void *pdata,
+											  const VkPipelineCacheCreateFlags flags,
+											  const VkAllocationCallbacks *pAllocator, const void *pNext) {
+
+	VkPipelineCache pipelineCache;
+
+	VkPipelineCacheCreateInfo pipelineCacheInfo{};
+	pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	pipelineCacheInfo.pNext = pNext;
+	pipelineCacheInfo.pInitialData = pdata;
+	pipelineCacheInfo.initialDataSize = size;
+	pipelineCacheInfo.flags = flags;
+
+	VKS_VALIDATE(vkCreatePipelineCache(device, &pipelineCacheInfo, pAllocator, &pipelineCache));
+
+	return pipelineCache;
 }
 
 // bool VKHelper::isDeviceSuitable(VkPhysicalDevice device) {
