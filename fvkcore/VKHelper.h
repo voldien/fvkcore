@@ -54,53 +54,9 @@ namespace fvkcore {
 
 		/**
 		 * @brief
-		 *
-		 * @param commandBuffer
-		 * @param image
-		 * @param format
-		 * @param oldLayout
-		 * @param newLayout
 		 */
 		static void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout,
-										  VkImageLayout newLayout, const void *pNext = nullptr) noexcept {
-
-			VkImageMemoryBarrier barrier{};
-			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			barrier.pNext = pNext;
-			barrier.oldLayout = oldLayout;
-			barrier.newLayout = newLayout;
-			barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			barrier.image = image;
-			/*	*/
-			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			barrier.subresourceRange.baseMipLevel = 0;
-			barrier.subresourceRange.levelCount = 1;
-			barrier.subresourceRange.baseArrayLayer = 0;
-			barrier.subresourceRange.layerCount = 1;
-
-			VkPipelineStageFlags sourceStage = 0;
-			VkPipelineStageFlags destinationStage = 0;
-
-			if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-				barrier.srcAccessMask = 0;
-				barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-				sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-				destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			} else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
-					   newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-				barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-				sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-				destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-			} else {
-				// throw cxxexcept::InvalidArgumentException("unsupported layout transition!");
-			}
-
-			vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-		}
+										  VkImageLayout newLayout, const void *pNext = nullptr) noexcept;
 
 		static void memoryBarrier(VkCommandBuffer cmd, const VkAccessFlags a, const VkAccessFlags b,
 								  const VkPipelineStageFlags src, const VkPipelineStageFlags dest,
@@ -196,8 +152,10 @@ namespace fvkcore {
 		 * @brief Create a Buffer object
 		 */
 		static void createBuffer(VkDevice device, VkDeviceSize size,
-								 const VkPhysicalDeviceMemoryProperties &memoryProperies, VkBufferUsageFlags usage,
-								 VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
+								 const VkPhysicalDeviceMemoryProperties &memoryProperies,
+								 const VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,
+								 VkDeviceMemory &bufferMemory, const VkAllocationCallbacks *pAllocator = nullptr,
+								 const void *pNext = nullptr);
 
 		/**
 		 * @brief
@@ -206,7 +164,7 @@ namespace fvkcore {
 								VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
 								const VkPhysicalDeviceMemoryProperties &memProperties, VkImage &image,
 								VkDeviceMemory &imageMemory, const VkAllocationCallbacks *pAllocator = nullptr,
-								const char *pNext = nullptr);
+								const void *pNext = nullptr);
 
 		/**
 		 * @brief Create a Image View object
@@ -217,43 +175,14 @@ namespace fvkcore {
 		 * @return VkImageView
 		 */
 		static VkImageView createImageView(VkDevice device, VkImage image, VkImageViewType imageType, VkFormat format,
-										   VkImageAspectFlags aspectFlags, uint32_t mipLevels);
+										   VkImageAspectFlags aspectFlags, uint32_t mipLevels,
+										   const VkAllocationCallbacks *pAllocator = nullptr,
+										   const void *pNext = nullptr);
 
 		//	template<typename T>
-		// TOOD add more params.
-		static void createSampler(VkDevice device, VkSampler &sampler, float maxSamplerAnisotropy = 1.0f,
-								  void *pNext = nullptr) {
-
-			VkSamplerCreateInfo samplerInfo{};
-			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerInfo.pNext = pNext;
-			samplerInfo.flags = 0;
-			/*	*/
-			samplerInfo.magFilter = VK_FILTER_LINEAR;
-			samplerInfo.minFilter = VK_FILTER_LINEAR;
-			/**/
-			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-			/*	*/
-			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			/*	*/
-			samplerInfo.mipLodBias = 0;
-			/*	*/
-			samplerInfo.anisotropyEnable = VK_FALSE;
-			samplerInfo.maxAnisotropy = maxSamplerAnisotropy;
-			/*	*/
-			samplerInfo.compareEnable = VK_FALSE;
-			samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-			/**/
-			samplerInfo.maxLod = 0;
-			samplerInfo.minLod = 0;
-			/**/
-			samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-			samplerInfo.unnormalizedCoordinates = VK_FALSE;
-
-			VKS_VALIDATE(vkCreateSampler(device, &samplerInfo, nullptr, &sampler));
-		}
+		static void createSampler(VkDevice device, VkSampler &sampler, const VkSamplerCreateFlags flags,
+								  float maxSamplerAnisotropy = 1.0f, VkAllocationCallbacks *pAllocator = nullptr,
+								  void *pNext = nullptr);
 
 		/**
 		 * @brief Create a Shader Module object
@@ -291,14 +220,9 @@ namespace fvkcore {
 
 		/**
 		 * @brief Create a Pipeline Layout object
-		 *
-		 * @param device
-		 * @param pipelineLayout
-		 * @param descLayouts
-		 * @param pushConstants
-		 * @param next
 		 */
 		static void createPipelineLayout(VkDevice device, VkPipelineLayout &pipelineLayout,
+										 const VkPipelineLayoutCreateFlags flags = 0,
 										 const std::vector<VkDescriptorSetLayout> &descLayouts = {},
 										 const std::vector<VkPushConstantRange> &pushConstants = {},
 										 const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr);
@@ -316,8 +240,8 @@ namespace fvkcore {
 			std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindingsV(descitprSetLayoutBindings.begin(),
 																				   descitprSetLayoutBindings.end());
 
-			createDescriptorSetLayout(device, descriptorSetLayout, descriptorSetLayoutBindingsV, flags, pAllocator,
-									  pNext);
+			VKHelper::createDescriptorSetLayout(device, descriptorSetLayout, descriptorSetLayoutBindingsV, flags,
+												pAllocator, pNext);
 		}
 
 		/**
@@ -327,40 +251,20 @@ namespace fvkcore {
 		createDescriptorSetLayout(VkDevice device, VkDescriptorSetLayout &descriptorSetLayout,
 								  const std::vector<VkDescriptorSetLayoutBinding> &descitprSetLayoutBindings,
 								  const VkDescriptorSetLayoutCreateFlags flags,
-								  const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) {
-			VkDescriptorSetLayoutCreateInfo layoutInfo{};
-			layoutInfo.pNext = pNext;
-			layoutInfo.flags = flags;
-			layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			layoutInfo.bindingCount = descitprSetLayoutBindings.size();
-			layoutInfo.pBindings = descitprSetLayoutBindings.data();
-
-			VKS_VALIDATE(vkCreateDescriptorSetLayout(device, &layoutInfo, pAllocator, &descriptorSetLayout));
-		}
+								  const VkAllocationCallbacks *pAllocator = nullptr, const void *pNext = nullptr);
 
 		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {},
-											   const VkDescriptorPoolCreateFlags flags = 0, uint32_t maxSets = 1,
+											   const VkDescriptorPoolCreateFlags flags = 0, const uint32_t maxSets = 1,
 											   const VkAllocationCallbacks *pAllocator = nullptr,
-											   void *pNext = nullptr) {
-			VkDescriptorPool descPool;
+											   const void *pNext = nullptr);
 
-			VkDescriptorPoolCreateInfo poolInfo{};
-			poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			poolInfo.pNext = pNext;
-			poolInfo.flags = flags;
-			poolInfo.poolSizeCount = poolSizes.size();
-			poolInfo.pPoolSizes = poolSizes.data();
-			poolInfo.maxSets = maxSets;
+		static void mergeDescriptorBinding(const std::vector<VkDescriptorSetLayoutBinding> &bindings,
+										   std::vector<VkDescriptorSetLayoutBinding> &mergedBindings);
 
-			VKS_VALIDATE(vkCreateDescriptorPool(device, &poolInfo, pAllocator, &descPool));
-
-			return descPool;
-		}
-
-		VkPipelineCache createPipelineCache(VkDevice device, const size_t size, void *pdata,
-											const VkPipelineCacheCreateFlags flags = 0,
-											const VkAllocationCallbacks *pAllocator = nullptr,
-											const void *pNext = nullptr);
+		static VkPipelineCache createPipelineCache(VkDevice device, const size_t size, void *pdata,
+												   const VkPipelineCacheCreateFlags flags = 0,
+												   const VkAllocationCallbacks *pAllocator = nullptr,
+												   const void *pNext = nullptr);
 
 		static VkPipeline createGraphicPipeline();
 
@@ -466,7 +370,7 @@ namespace fvkcore {
 		 * @param size
 		 */
 		static void stageBufferCopy(VkDevice device, VkQueue queue, VkCommandPool commandPool, VkBuffer src,
-									VkBuffer dst, VkDeviceSize size) {
+									VkBuffer dst, const VkDeviceSize size) {
 
 			VkCommandBufferAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -517,7 +421,8 @@ namespace fvkcore {
 			vkCmdCopyBufferToImage(cmd, src, dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 		}
 
-		static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool, const void* pNext = nullptr) {
+		static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool,
+													   const void *pNext = nullptr) {
 			VkCommandBufferAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 			allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -537,7 +442,8 @@ namespace fvkcore {
 		}
 
 		static void endSingleTimeCommands(VkDevice device, VkQueue queue, VkCommandBuffer commandBuffer,
-										  VkCommandPool commandPool, VkFence fence = VK_NULL_HANDLE, const void* pNext = nullptr) {
+										  VkCommandPool commandPool, VkFence fence = VK_NULL_HANDLE,
+										  const void *pNext = nullptr) {
 			VKS_VALIDATE(vkEndCommandBuffer(commandBuffer));
 
 			VkSubmitInfo submitInfo{};
@@ -545,7 +451,6 @@ namespace fvkcore {
 			submitInfo.pNext = pNext;
 			submitInfo.commandBufferCount = 1;
 			submitInfo.pCommandBuffers = &commandBuffer;
-
 
 			VKS_VALIDATE(vkQueueSubmit(queue, 1, &submitInfo, fence));
 			VKS_VALIDATE(vkQueueWaitIdle(queue));
