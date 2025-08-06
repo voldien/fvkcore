@@ -160,9 +160,9 @@ namespace fvkcore {
 		/**
 		 * @brief
 		 */
-		static void createImage(VkDevice device, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
+		static void createImage2D(VkDevice device, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
 								VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
-								const VkPhysicalDeviceMemoryProperties &memProperties, VkImage &image,
+								const VkPhysicalDeviceMemoryProperties &memProperties, const VkImageCreateFlags flags, VkImage &image,
 								VkDeviceMemory &imageMemory, const VkAllocationCallbacks *pAllocator = nullptr,
 								const void *pNext = nullptr);
 
@@ -250,7 +250,7 @@ namespace fvkcore {
 		static void
 		createDescriptorSetLayout(VkDevice device, VkDescriptorSetLayout &descriptorSetLayout,
 								  const std::vector<VkDescriptorSetLayoutBinding> &descitprSetLayoutBindings,
-								  const VkDescriptorSetLayoutCreateFlags flags,
+								  const VkDescriptorSetLayoutCreateFlags flags = 0,
 								  const VkAllocationCallbacks *pAllocator = nullptr, const void *pNext = nullptr);
 
 		static VkDescriptorPool createDescPool(VkDevice device, const std::vector<VkDescriptorPoolSize> &poolSizes = {},
@@ -268,27 +268,12 @@ namespace fvkcore {
 
 		static VkPipeline createGraphicPipeline();
 
-		static VkPipeline createComputePipeline(
-			VkDevice device, VkPipelineLayout layout, const VkPipelineShaderStageCreateInfo &compShaderStageInfo,
-			VkPipelineCache pipelineCache = VK_NULL_HANDLE, VkPipeline basePipelineHandle = VK_NULL_HANDLE,
-			uint32_t basePipelineIndex = 0, const VkAllocationCallbacks *pAllocator = nullptr, void *pNext = nullptr) {
-
-			VkPipeline pipeline;
-
-			VkComputePipelineCreateInfo pipelineCreateInfo = {};
-			pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-			pipelineCreateInfo.pNext = pNext;
-			pipelineCreateInfo.flags = 0;
-			pipelineCreateInfo.stage = compShaderStageInfo;
-			pipelineCreateInfo.layout = layout;
-			pipelineCreateInfo.basePipelineHandle = basePipelineHandle;
-			pipelineCreateInfo.basePipelineIndex = basePipelineIndex;
-
-			VKS_VALIDATE(
-				vkCreateComputePipelines(device, pipelineCache, 1, &pipelineCreateInfo, pAllocator, &pipeline));
-
-			return pipeline;
-		}
+		static VkPipeline
+		createComputePipeline(VkDevice device, VkPipelineLayout layout,
+							  const VkPipelineShaderStageCreateInfo &compShaderStageInfo,
+							  const VkPipelineCreateFlags flags = 0, VkPipelineCache pipelineCache = VK_NULL_HANDLE,
+							  VkPipeline basePipelineHandle = VK_NULL_HANDLE, uint32_t basePipelineIndex = 0,
+							  const VkAllocationCallbacks *pAllocator = nullptr, const void *pNext = nullptr);
 
 		//
 		// static bool isDeviceSuitable(VkPhysicalDevice device);

@@ -105,32 +105,16 @@ namespace fvkcore {
 
 		/**
 		 */
-		bool isFormatSupported(VkFormat format, VkImageType imageType, VkImageTiling tiling, VkImageUsageFlags usage,
-							   VkImageFormatProperties *PimageFormatProperties = nullptr) const {
-			VkImageFormatProperties prop;
-			if (PimageFormatProperties == nullptr)
-				PimageFormatProperties = &prop;
-			VkResult result = vkGetPhysicalDeviceImageFormatProperties(this->getHandle(), format, imageType, tiling,
-																	   usage, 0, PimageFormatProperties);
-			if (result == VK_SUCCESS) {
-				return true;
-			} else if (result == VK_ERROR_FORMAT_NOT_SUPPORTED) {
-				return false;
-			} else {
-				VKS_VALIDATE(result);
-				return false;
-			}
-		}
-
+		bool isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
+							   const VkImageUsageFlags usage, const VkImageCreateFlags flags,
+							   VkImageFormatProperties *PimageFormatProperties = nullptr) const;
 		/**
 		 * @brief Get the Format Properties object
 		 *
 		 * @param format
 		 * @param props
 		 */
-		void getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept {
-			vkGetPhysicalDeviceFormatProperties(this->getHandle(), format, &props);
-		}
+		void getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept;
 
 		/**
 		 * @brief Get the Supported Format object

@@ -208,11 +208,8 @@ namespace fvkcore {
 		}
 
 		bool isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
-							   const VkImageUsageFlags usage) const noexcept {
-
-			/*	Check either as the group or the physical device.	*/
-			return this->getPhysicalDevice(0)->isFormatSupported(format, imageType, tiling, usage);
-		}
+							   const VkImageUsageFlags usage, const VkImageCreateFlags flags = 0,
+							   VkImageFormatProperties *capability = nullptr) const noexcept;
 
 		struct VKQueue {
 		  public:

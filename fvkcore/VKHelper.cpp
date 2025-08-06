@@ -106,15 +106,16 @@ void VKHelper::createBuffer(VkDevice device, VkDeviceSize size, const VkPhysical
 	VKS_VALIDATE(vkBindBufferMemory(device, buffer, bufferMemory, 0));
 }
 
-void VKHelper::createImage(VkDevice device, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
-						   VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
-						   const VkPhysicalDeviceMemoryProperties &memProperties, VkImage &image,
-						   VkDeviceMemory &imageMemory, const VkAllocationCallbacks *pAllocator, const void *pNext) {
+void VKHelper::createImage2D(VkDevice device, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
+							 VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
+							 const VkPhysicalDeviceMemoryProperties &memProperties, const VkImageCreateFlags flags,
+							 VkImage &image, VkDeviceMemory &imageMemory, const VkAllocationCallbacks *pAllocator,
+							 const void *pNext) {
 
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.pNext = pNext;
-	imageInfo.flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
+	imageInfo.flags = flags;
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
 	imageInfo.format = format;
 	/*	*/
@@ -296,6 +297,28 @@ VkDescriptorPool VKHelper::createDescPool(VkDevice device, const std::vector<VkD
 	VKS_VALIDATE(vkCreateDescriptorPool(device, &poolInfo, pAllocator, &descPool));
 
 	return descPool;
+}
+
+VkPipeline VKHelper::createComputePipeline(VkDevice device, VkPipelineLayout layout,
+										   const VkPipelineShaderStageCreateInfo &compShaderStageInfo,
+										   const VkPipelineCreateFlags flags, VkPipelineCache pipelineCache,
+										   VkPipeline basePipelineHandle, uint32_t basePipelineIndex,
+										   const VkAllocationCallbacks *pAllocator, const void *pNext) {
+
+	VkPipeline pipeline;
+
+	VkComputePipelineCreateInfo pipelineCreateInfo = {};
+	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	pipelineCreateInfo.pNext = pNext;
+	pipelineCreateInfo.flags = flags;
+	pipelineCreateInfo.stage = compShaderStageInfo;
+	pipelineCreateInfo.layout = layout;
+	pipelineCreateInfo.basePipelineHandle = basePipelineHandle;
+	pipelineCreateInfo.basePipelineIndex = basePipelineIndex;
+
+	VKS_VALIDATE(vkCreateComputePipelines(device, pipelineCache, 1, &pipelineCreateInfo, pAllocator, &pipeline));
+
+	return pipeline;
 }
 
 // bool VKHelper::isDeviceSuitable(VkPhysicalDevice device) {

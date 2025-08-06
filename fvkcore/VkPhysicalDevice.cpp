@@ -1,4 +1,5 @@
 #include "VkPhysicalDevice.h"
+#include "vulkan/vulkan_core.h"
 
 using namespace fvkcore;
 
@@ -42,6 +43,44 @@ void PhysicalDevice::initPhysicalDevice(VkPhysicalDevice device) {
 	}
 
 	this->mdevice = device;
+}
+
+bool PhysicalDevice::isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
+									   const VkImageUsageFlags usage, const VkImageCreateFlags flags,
+									   VkImageFormatProperties *PimageFormatProperties) const {
+
+	VkImageFormatProperties prop;
+	if (PimageFormatProperties == nullptr) {
+		PimageFormatProperties = &prop;
+	}
+
+	VkPhysicalDeviceImageFormatInfo2 deviceFormatInfo;
+	deviceFormatInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
+	deviceFormatInfo.pNext = nullptr;
+	deviceFormatInfo.type = imageType;
+	deviceFormatInfo.tiling = tiling;
+	deviceFormatInfo.usage = usage;
+	deviceFormatInfo.flags = flags;
+
+	VkImageFormatProperties2 imageFormatPropertie;
+	imageFormatPropertie.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
+	imageFormatPropertie.pNext = nullptr;
+
+	VkResult result =
+		vkGetPhysicalDeviceImageFormatProperties2(this->getHandle(), &deviceFormatInfo, &imageFormatPropertie);
+
+	if (result == VK_SUCCESS) {
+		return true;
+	} else if (result == VK_ERROR_FORMAT_NOT_SUPPORTED || result == VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR) {
+		return false;
+	} else {
+		VKS_VALIDATE(result);
+		return false;
+	}
+}
+
+void PhysicalDevice::getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept {
+	vkGetPhysicalDeviceFormatProperties(this->getHandle(), format, &props);
 }
 
 bool PhysicalDevice::isPresentable(VkSurfaceKHR surface, uint32_t queueFamilyIndex) const {

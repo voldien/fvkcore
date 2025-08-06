@@ -152,3 +152,11 @@ void VKDevice::createDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &
 		}
 	}
 }
+
+bool VKDevice::isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
+								 const VkImageUsageFlags usage, const VkImageCreateFlags flags,
+								 VkImageFormatProperties *capability) const noexcept {
+
+	/*	Check either as the group or the physical device.	*/
+	return this->getPhysicalDevice(0)->isFormatSupported(format, imageType, tiling, usage, flags, capability);
+}
