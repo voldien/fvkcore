@@ -41,12 +41,12 @@ namespace fvkcore {
 	  public:
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+				 const VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
 				 const void *pNext = nullptr);
 
 		VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 				 const std::unordered_map<const char *, bool> &requested_extensions = {{"VK_KHR_swapchain", true}},
-				 VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+				const  VkQueueFlags requiredQueues = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
 				 const void *pNext = nullptr);
 
 		VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physicalDevices,
@@ -206,6 +206,8 @@ namespace fvkcore {
 
 			vkFreeCommandBuffers(this->getHandle(), commandPool, cmds.size(), cmds.data());
 		}
+
+		VkDeviceAddress getBufferAddress(VkBuffer buffer, const void *pNext = nullptr);
 
 		bool isFormatSupported(const VkFormat format, const VkImageType imageType, const VkImageTiling tiling,
 							   const VkImageUsageFlags usage, const VkImageCreateFlags flags = 0,

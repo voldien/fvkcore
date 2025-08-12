@@ -5,7 +5,7 @@
 using namespace fvkcore;
 
 VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physical_devices,
-				   const std::unordered_map<const char *, bool> &requested_extensions, VkQueueFlags requiredQueues,
+				   const std::unordered_map<const char *, bool> &requested_extensions, const VkQueueFlags requiredQueues,
 				   const void *pNext) {
 
 	/*  Select queue with graphic.  */
@@ -58,7 +58,7 @@ VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physical_
 }
 
 VKDevice::VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
-				   const std::unordered_map<const char *, bool> &requested_extensions, VkQueueFlags requiredQueues,
+				   const std::unordered_map<const char *, bool> &requested_extensions, const VkQueueFlags requiredQueues,
 				   const void *pNext) {
 	/*	*/
 	// const std::vector<std::shared_ptr<PhysicalDevice>> physical_device = {physicalDevice};
@@ -69,7 +69,7 @@ VKDevice::VKDevice(const std::shared_ptr<PhysicalDevice> &physicalDevice,
 VKDevice::VKDevice(const std::vector<std::shared_ptr<PhysicalDevice>> &physical_devices,
 				   const std::unordered_map<const char *, bool> &requested_extensions,
 				   const std::vector<VkDeviceQueueCreateInfo> &queueCreations, const void *pNext) {
-	createDevice(physical_devices, requested_extensions, queueCreations, pNext);
+	this->createDevice(physical_devices, requested_extensions, queueCreations, pNext);
 }
 
 VKDevice::~VKDevice() {
@@ -159,4 +159,12 @@ bool VKDevice::isFormatSupported(const VkFormat format, const VkImageType imageT
 
 	/*	Check either as the group or the physical device.	*/
 	return this->getPhysicalDevice(0)->isFormatSupported(format, imageType, tiling, usage, flags, capability);
+}
+
+VkDeviceAddress VKDevice::getBufferAddress(VkBuffer buffer, const void *pNext) {
+	VkBufferDeviceAddressInfo info;
+	info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+	info.pNext = pNext;
+	info.buffer = buffer;
+	return vkGetBufferDeviceAddress(this->getHandle(), &info);
 }

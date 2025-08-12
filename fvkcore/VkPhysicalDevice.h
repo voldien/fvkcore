@@ -64,8 +64,6 @@ namespace fvkcore {
 		/**
 		 * @brief Get the Queue Family Properties object
 		 * Get all the support family properties.
-		 *
-		 * @return const std::vector<VkQueueFamilyProperties>&
 		 */
 		const std::vector<VkQueueFamilyProperties> &getQueueFamilyProperties() const noexcept {
 			return this->queueFamilyProperties;
@@ -110,11 +108,8 @@ namespace fvkcore {
 							   VkImageFormatProperties *PimageFormatProperties = nullptr) const;
 		/**
 		 * @brief Get the Format Properties object
-		 *
-		 * @param format
-		 * @param props
 		 */
-		void getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept;
+		void getFormatProperties(const VkFormat format, VkFormatProperties &props) const noexcept;
 
 		/**
 		 * @brief Get the Supported Format object
@@ -123,8 +118,6 @@ namespace fvkcore {
 		 * @param candidates
 		 * @param tiling
 		 * @param features
-		 * @return true
-		 * @return false
 		 */
 		bool getSupportedFormat(VkFormat &supported, const std::vector<VkFormat> &candidates, VkImageTiling tiling,
 								VkFormatFeatureFlags features) const {
@@ -163,11 +156,7 @@ namespace fvkcore {
 		const std::vector<VkExtensionProperties> &getExtensions() const noexcept { return this->extensions; }
 
 		/**
-		 * @brief Check if extension is support by the physical device.
-		 *
-		 * @param extension
-		 * @return true
-		 * @return false
+		 * @brief Check
 		 */
 		bool isExtensionSupported(const std::string &extension) const noexcept {
 			return std::find_if(this->getExtensions().begin(), this->getExtensions().end(),
@@ -177,11 +166,7 @@ namespace fvkcore {
 		}
 
 		/**
-		 * @brief
-		 *
-		 * @tparam T
-		 * @param type
-		 * @param requestFeature
+		 * @brief Get
 		 */
 		template <typename T> void checkFeature(VkStructureType type, T &requestFeature) noexcept {
 
@@ -190,6 +175,7 @@ namespace fvkcore {
 			feature.pNext = &requestFeature;
 
 			requestFeature.sType = type;
+			requestFeature.pNext = nullptr;
 			vkGetPhysicalDeviceFeatures2(this->getHandle(), &feature);
 		}
 
@@ -201,11 +187,7 @@ namespace fvkcore {
 		}
 
 		/**
-		 * @brief Get the Properties object
-		 *
-		 * @tparam T
-		 * @param type
-		 * @param requestProperties
+		 * @brief Get
 		 */
 		template <typename T> void getProperties(VkStructureType type, T &requestProperties) noexcept {
 			VkPhysicalDeviceProperties2 properties{};
@@ -216,19 +198,19 @@ namespace fvkcore {
 			vkGetPhysicalDeviceProperties2(getHandle(), &properties);
 		}
 
+		VkSampleCountFlagBits getMaxUsableSampleCount() const noexcept;
+
 		const char *getDeviceName() const noexcept;
 
 		/**
 		 * @brief Get Vulkan instance core associated with the physical device.
-		 *
-		 * @return VulkanCore&
 		 */
 		VulkanCore &getInstance() const noexcept { return this->vkCore; }
 
 	  protected: /*	*/
 		void initPhysicalDevice(VkPhysicalDevice device);
 
-	  private: /*	*/
+	  private: /*	Properties.		*/
 		VkPhysicalDevice mdevice;
 		VkPhysicalDeviceFeatures features;
 		VkPhysicalDeviceMemoryProperties memProperties;

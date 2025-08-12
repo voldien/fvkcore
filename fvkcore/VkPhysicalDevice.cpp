@@ -61,6 +61,7 @@ bool PhysicalDevice::isFormatSupported(const VkFormat format, const VkImageType 
 	deviceFormatInfo.tiling = tiling;
 	deviceFormatInfo.usage = usage;
 	deviceFormatInfo.flags = flags;
+	deviceFormatInfo.format = format;
 
 	VkImageFormatProperties2 imageFormatPropertie;
 	imageFormatPropertie.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
@@ -68,6 +69,8 @@ bool PhysicalDevice::isFormatSupported(const VkFormat format, const VkImageType 
 
 	VkResult result =
 		vkGetPhysicalDeviceImageFormatProperties2(this->getHandle(), &deviceFormatInfo, &imageFormatPropertie);
+
+	*PimageFormatProperties = imageFormatPropertie.imageFormatProperties;
 
 	if (result == VK_SUCCESS) {
 		return true;
@@ -79,7 +82,7 @@ bool PhysicalDevice::isFormatSupported(const VkFormat format, const VkImageType 
 	}
 }
 
-void PhysicalDevice::getFormatProperties(VkFormat format, VkFormatProperties &props) const noexcept {
+void PhysicalDevice::getFormatProperties(const VkFormat format, VkFormatProperties &props) const noexcept {
 	vkGetPhysicalDeviceFormatProperties(this->getHandle(), format, &props);
 }
 
@@ -92,6 +95,36 @@ bool PhysicalDevice::isPresentable(VkSurfaceKHR surface, uint32_t queueFamilyInd
 	}
 
 	return present_supported;
+}
+
+VkSampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const noexcept {
+
+	VkPhysicalDeviceProperties physicalDeviceProperties;
+	vkGetPhysicalDeviceProperties(this->getHandle(), &physicalDeviceProperties);
+
+	const VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts &
+									  physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+
+	if (counts & VK_SAMPLE_COUNT_64_BIT) {
+		return VK_SAMPLE_COUNT_64_BIT;
+	}
+	if (counts & VK_SAMPLE_COUNT_32_BIT) {
+		return VK_SAMPLE_COUNT_32_BIT;
+	}
+	if (counts & VK_SAMPLE_COUNT_16_BIT) {
+		return VK_SAMPLE_COUNT_16_BIT;
+	}
+	if (counts & VK_SAMPLE_COUNT_8_BIT) {
+		return VK_SAMPLE_COUNT_8_BIT;
+	}
+	if (counts & VK_SAMPLE_COUNT_4_BIT) {
+		return VK_SAMPLE_COUNT_4_BIT;
+	}
+	if (counts & VK_SAMPLE_COUNT_2_BIT) {
+		return VK_SAMPLE_COUNT_2_BIT;
+	}
+
+	return VK_SAMPLE_COUNT_1_BIT;
 }
 
 const char *PhysicalDevice::getDeviceName() const noexcept { return this->properties.deviceName; }
